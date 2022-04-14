@@ -1,4 +1,9 @@
 import fetch from 'node-fetch';
+import sqlite from 'aa-sqlite';
+import log from 'log-beautify';
+
+
+await sqlite.open('./main.db')
 
 class WBKeyword {
     constructor(keyword){
@@ -57,33 +62,49 @@ class WBSearch {
     }
 }
 
-var keywords = [
-    'менструальные чаши',
-    'чаша для месячных',
-    'вагинальная чаша',
-    'менструальные трусы',
-    'трусы для месячных',
-    'прокладки женские',
-    'прокладки гигиенические',
-    'тампоны'
-]
 
-var SKU = [72960860, 71786393, 60059650, 71786349]
+( async () => {
+    var keywords = (await sqlite.all("SELECT keyword FROM keywords"))
+                    .map((v,i) => v.keyword)
+    var products = (await sqlite.all("SELECT id FROM products"))
+                    .map((v,i) => v.id)
 
+    let interval = 5 * 1000 //seconds * milliseconds
 
-for(let keyword of keywords){
+    setInterval(async function(){
+        await init(keywords, products)
+    }, interval)
+})()
 
-    let key = new WBKeyword(keyword)
-    await key.fetchData()
-    let search = new WBSearch(key)
-    await search.fetchData()
-
-    console.info(`Запрос: ${keyword} | Всего: ${search.positions.length}`)
-
-    search.positions.forEach(function(product, idx){
-        let idxFound = SKU.indexOf(product.id)
-        if (idxFound != -1){
-            console.log(`Артикул: ${SKU[idxFound]} | Позиция: ${idx+1}`)
-        }
-    })
+async function insertStats(keyword, product, position, total_products){
+    let insert = 'INSERT INTO stats(keyword, product, position, total_products) VALUES(?,?,?,?)'
+    console.log([...arguments])
+    try {
+        await sqlite.push(insert, [...arguments])
+    } catch (err) {
+        console.log(err)
+    }
 }
+
+async function init(keywords, products){
+    for(let keyword of keywords){
+
+        let key = new WBKeyword(keyword)
+        await key.fetchData()
+        let search = new WBSearch(key)
+        await search.fetchData()
+
+        let total_products = search.positions.length
+
+        console.info(`Запрос: ${keyword} | Всего: ${total_products}`)
+
+        search.positions.forEach(async function(product, idx){
+            let idxFound = products.indexOf(product.id)
+            if (idxFound != -1){
+                console.log(`Артикул: ${products[idxFound]} | Позиция: ${idx+1}`)
+                await insertStats( keyword, products[idxFound], idx+1, total_products)
+            }
+        })
+    }
+}
+
