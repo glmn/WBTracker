@@ -66,4 +66,13 @@ await key.fetchData()
 let search = new WBSearch(key)
 await search.fetchData()
 
-console.log(search.positions.length)
+let SKU = [72960860, 71786393, 60059650, 71786349]
+
+console.log(search.positions[0])
+
+search.positions.forEach(function(product, idx){
+    let idxFound = SKU.indexOf(product.id)
+    if (idxFound != -1){
+        console.log(`Артикул: ${SKU[idxFound]} | Позиция: ${idx+1}`)
+    }
+})
