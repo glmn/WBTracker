@@ -42,7 +42,8 @@ class WBSearch {
             'couponsGeo': [2,6,7,3,19,21,8],
             'dest': [-1059500,-108082,-269701,12358048],
             'preset': this.keyword.preset,
-            'sort': 'popular'
+            'sort': 'popular',
+            'limit': 300
         }
 
         this.queryParams = new URLSearchParams(this.params).toString()
@@ -51,6 +52,7 @@ class WBSearch {
 
         console.log(this.url)
     }
+
 }
 
 let key = new WBKeyword('менструальные чаши')
