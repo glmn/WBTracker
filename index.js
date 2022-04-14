@@ -9,8 +9,8 @@ class WBKeyword {
     }
 
     async fetchData(){
-        let URL = "https://wbxsearch.wildberries.ru/exactmatch/v2/male?query=" + encodeURI(this.keyword)
-        let response = await fetch(URL)
+        let url = "https://wbxsearch.wildberries.ru/exactmatch/v2/male?query=" + encodeURI(this.keyword)
+        let response = await fetch(url)
         let jsonData = await response.json()
 
         this.query = jsonData.query
@@ -45,16 +45,25 @@ class WBSearch {
             'sort': 'popular',
             'limit': 300
         }
-
-        this.queryParams = new URLSearchParams(this.params).toString()
-
-        this.url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + this.queryParams
-
-        console.log(this.url)
     }
 
+    async fetchData(){
+        let queryParams = new URLSearchParams(this.params).toString()
+        let url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + queryParams
+        let response = await fetch(url)
+        let jsonData = await response.json()
+        this.positions.push(...jsonData.data.products)
+
+        if(jsonData.data.products.length == 300){
+            this.params.page += 1
+            await this.fetchData()
+        }
+    }
 }
 
 let key = new WBKeyword('менструальные чаши')
 await key.fetchData()
-new WBSearch(key)
+let search = new WBSearch(key)
+await search.fetchData()
+
+console.log(search.positions.length)
