@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import sqlite from 'aa-sqlite';
 import log from 'log-beautify';
+import {Loader, Aphorism} from 'loader-in-console';
 
 
 await sqlite.open('./main.db')
@@ -69,16 +70,38 @@ class WBSearch {
     var products = (await sqlite.all("SELECT id FROM products"))
                     .map((v,i) => v.id)
 
-    let interval = 5 * 1000 //seconds * milliseconds
+    log.success('Ключевые слова')
+    log.show(keywords.join(', '), "\n")
+
+    log.success('SKU товаров')
+    log.show(products.join(', '), "\n")
+
+    Loader.startDotLine(500, 'Подготовка к первому запуску')
+
+    const interval = 5 * 1000 //seconds * milliseconds
+
+    setTimeout(function(){
+        Loader.stop()
+        log.show()
+    }, interval - 500)
+
+    var checksCount = 0;
+    var startTime = new Date().toLocaleString()
 
     setInterval(async function(){
+        showInfo(checksCount, startTime, 'Сканирую')
         await init(keywords, products)
+        checksCount++
+        showInfo(checksCount, startTime, 'Отдыхаю')
     }, interval)
 })()
 
+function showInfo(checksCount, startTime, status){
+    log.info(`Проверок: ${checksCount} | Время запуска: ${startTime} | ${status}`)
+}
+
 async function insertStats(keyword, product, position, total_products){
     let insert = 'INSERT INTO stats(keyword, product, position, total_products) VALUES(?,?,?,?)'
-    console.log([...arguments])
     try {
         await sqlite.push(insert, [...arguments])
     } catch (err) {
@@ -96,12 +119,9 @@ async function init(keywords, products){
 
         let total_products = search.positions.length
 
-        console.info(`Запрос: ${keyword} | Всего: ${total_products}`)
-
         search.positions.forEach(async function(product, idx){
             let idxFound = products.indexOf(product.id)
             if (idxFound != -1){
-                console.log(`Артикул: ${products[idxFound]} | Позиция: ${idx+1}`)
                 await insertStats( keyword, products[idxFound], idx+1, total_products)
             }
         })

@@ -22,6 +22,7 @@
   "homepage": "https://github.com/glmn/WBTracker#readme",
   "dependencies": {
     "aa-sqlite": "^1.0.29",
+    "loader-in-console": "^1.2.1",
     "log-beautify": "^1.2.0",
     "node-fetch": "^3.2.3",
     "sqlite3": "^5.0.3"
