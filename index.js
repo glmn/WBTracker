@@ -5,7 +5,6 @@ class WBKeyword {
         this.keyword = keyword
         this.query = ''
         this.shardKey = ''
-        this.preset = ''
     }
 
     async fetchData(){
@@ -15,14 +14,12 @@ class WBKeyword {
 
         this.query = jsonData.query
         this.shardKey = jsonData.shardKey
-        this.preset = this.query.replace('preset=','')
     }
 }
 
 class WBSearch {
     constructor(keyword){
         this.keyword = keyword
-
         this.positions = []
 
         this.params = {
@@ -41,7 +38,6 @@ class WBSearch {
             'curr': 'rub',
             'couponsGeo': [2,6,7,3,19,21,8],
             'dest': [-1059500,-108082,-269701,12358048],
-            'preset': this.keyword.preset,
             'sort': 'popular',
             'limit': 300
         }
@@ -49,7 +45,7 @@ class WBSearch {
 
     async fetchData(){
         let queryParams = new URLSearchParams(this.params).toString()
-        let url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + queryParams
+        let url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + queryParams + '&' + this.keyword.query
         let response = await fetch(url)
         let jsonData = await response.json()
         this.positions.push(...jsonData.data.products)
@@ -61,18 +57,33 @@ class WBSearch {
     }
 }
 
-let key = new WBKeyword('менструальные чаши')
-await key.fetchData()
-let search = new WBSearch(key)
-await search.fetchData()
+var keywords = [
+    'менструальные чаши',
+    'чаша для месячных',
+    'вагинальная чаша',
+    'менструальные трусы',
+    'трусы для месячных',
+    'прокладки женские',
+    'прокладки гигиенические',
+    'тампоны'
+]
 
-let SKU = [72960860, 71786393, 60059650, 71786349]
+var SKU = [72960860, 71786393, 60059650, 71786349]
 
-console.log(search.positions[0])
 
-search.positions.forEach(function(product, idx){
-    let idxFound = SKU.indexOf(product.id)
-    if (idxFound != -1){
-        console.log(`Артикул: ${SKU[idxFound]} | Позиция: ${idx+1}`)
-    }
-})
+for(let keyword of keywords){
+
+    let key = new WBKeyword(keyword)
+    await key.fetchData()
+    let search = new WBSearch(key)
+    await search.fetchData()
+
+    console.info(`Запрос: ${keyword} | Всего: ${search.positions.length}`)
+
+    search.positions.forEach(function(product, idx){
+        let idxFound = SKU.indexOf(product.id)
+        if (idxFound != -1){
+            console.log(`Артикул: ${SKU[idxFound]} | Позиция: ${idx+1}`)
+        }
+    })
+}
