@@ -5,3 +5,6 @@
 <h5 align="center">:trophy:<code>Must Have <s>Weapon</s> Tool for TOP-1 on Wildberries</code></h5>
 <h5 align="center">:white_check_mark:<code>Standalone version</code></h5>
 
+To-Do List:
+- [ ] Implement Interactive mode
+- [ ] Realtime Charts
