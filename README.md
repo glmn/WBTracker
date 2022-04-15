@@ -5,7 +5,7 @@
 <h5 align="center">:white_check_mark:<code>Standalone version</code></h5>
 
 
-##### How to run?
+#### How to run?
 - Clone this repo ```git clone https://github.com/glmn/WBTracker.git```
 - Create in root folder <code>main.db</code> file
 - With any SQL Managers open <code>main.db</code> database and execute next query 
@@ -45,9 +45,9 @@ PRAGMA foreign_keys = on;
 - Fill <code>products</code> table with your products SKUs
 - You are ready to go, just type <code>node index</code> in your terminal
 
-##### How to watch positions data?
+#### How to watch positions data?
 Not implemented yet :laughing: Use your SQL skills to gather cool analytics
 
-To-Do List:
+#### To-Do List
 - [ ] Implement Interactive mode
 - [ ] Realtime Charts
