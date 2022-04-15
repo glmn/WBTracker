@@ -11,17 +11,40 @@
 - Create in root folder <code>main.db</code> file
 - With any SQL Managers open <code>main.db</code> database and execute next query 
 ```SQL
+--
+-- File generated with SQLiteStudio v3.3.3 on Пт апр 15 07:14:23 2022
+--
+-- Text encoding used: System
+--
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+
 -- Table: keywords
-CREATE TABLE keywords (keyword STRING UNIQUE);
+CREATE TABLE keywords (
+    keyword STRING UNIQUE
+);
+
 
 -- Table: products
-CREATE TABLE products (id INT UNIQUE PRIMARY KEY);
+CREATE TABLE products (
+    id INT UNIQUE
+         PRIMARY KEY
+);
+
 
 -- Table: stats
-CREATE TABLE stats (timestamp DATETIME DEFAULT (CURRENT_TIMESTAMP), keyword STRING, product INT, position INT, total_products INT);
+CREATE TABLE stats (
+    timestamp      DATETIME DEFAULT (CURRENT_TIMESTAMP),
+    keyword        STRING,
+    product        INT,
+    position       INT,
+    total_products INT
+);
+
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
+
 
 ```
 - Fill <code>keywords</code> table with your keywords
