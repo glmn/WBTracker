@@ -7,7 +7,7 @@
 
 
 ##### How to use?
-- Clone this repo <code>git clone https://github.com/glmn/WBTracker.git</code>
+- Clone this repo ```git clone https://github.com/glmn/WBTracker.git```
 - Create in root folder <code>main.db</code> file
 - With any SQL Managers open <code>main.db</code> database and execute next query 
 ```SQL
