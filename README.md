@@ -11,11 +11,6 @@
 - Create in root folder <code>main.db</code> file
 - With any SQL Managers open <code>main.db</code> database and execute next query 
 ```SQL
---
--- File generated with SQLiteStudio v3.3.3 on Пт апр 15 07:14:23 2022
---
--- Text encoding used: System
---
 PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;
 
