@@ -24,6 +24,9 @@ COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
 
 ```
+- Fill <code>keywords</code> table with your keywords
+- Fill <code>products</code> table with your products SKUs
+- You are ready to go, just type <code>node index</code> in your terminal
 
 
 
