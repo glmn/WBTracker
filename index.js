@@ -76,17 +76,15 @@ class WBSearch {
     log.success('SKU товаров')
     log.show(products.join(', '), "\n")
 
-    Loader.startDotLine(500, 'Подготовка к первому запуску')
-
-    const interval = 5 * 1000 //seconds * milliseconds
-
-    setTimeout(function(){
-        Loader.stop()
-        log.show()
-    }, interval - 500)
+    const interval = 1 * 60 * 1000
 
     var checksCount = 0;
     var startTime = new Date().toLocaleString()
+
+    showInfo(checksCount, startTime, 'Сканирую')
+    await init(keywords, products)
+    checksCount++
+    showInfo(checksCount, startTime, 'Отдыхаю')
 
     setInterval(async function(){
         showInfo(checksCount, startTime, 'Сканирую')
@@ -97,7 +95,9 @@ class WBSearch {
 })()
 
 function showInfo(checksCount, startTime, status){
-    log.info(`Проверок: ${checksCount} | Время запуска: ${startTime} | ${status}`)
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write(`\x1b[4m\x1b[36mПроверок: ${checksCount}\x1b[0m | Время запуска: ${startTime} | \x1b[32m${status}\x1b[0m`)
 }
 
 async function insertStats(keyword, product, position, total_products){
