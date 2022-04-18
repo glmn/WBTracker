@@ -14,7 +14,7 @@ class WBKeyword {
     }
 
     async fetchData(){
-        let url = "https://wbxsearch.wildberries.ru/exactmatch/v2/male?query=" + encodeURI(this.keyword)
+        let url = "https://wbxsearch.wildberries.ru/exactmatch/v2/female?query=" + encodeURI(this.keyword)
         let response = await fetch(url)
         let jsonData = await response.json()
 
@@ -76,7 +76,7 @@ class WBSearch {
     log.success('SKU товаров')
     log.show(products.join(', '), "\n")
 
-    const interval = 1 * 60 * 1000
+    const interval = 10 * 60 * 1000
 
     var checksCount = 0;
     var startTime = new Date().toLocaleString()
