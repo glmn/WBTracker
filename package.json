@@ -25,6 +25,7 @@
     "loader-in-console": "^1.2.1",
     "log-beautify": "^1.2.0",
     "node-fetch": "^3.2.3",
-    "sqlite3": "^5.0.3"
+    "sqlite3": "^5.0.3",
+    "ws": "^8.5.0"
   }
 }
