@@ -5,7 +5,8 @@
   "description": "Wildberries search positions tracker",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "scan": "node fetcher.js",
+    "watch": "node viewer.js"
   },
   "repository": {
     "type": "git",

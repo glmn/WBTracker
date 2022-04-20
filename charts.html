@@ -1,6 +1,18 @@
 <html>
 <head></head>
-<body>
+<script>
+    const ws = new WebSocket("ws://127.0.0.1:9000");
+    ws.onopen = function() {
+        ws.send('ping')
+        ws.send('get.keywords')
+        ws.send('get.products')
+    };
+
+    ws.onmessage = function(event) {
+        console.log(event.data);
+    };
+</script>
+<body id="app">
     test
 </body>
 </html>
