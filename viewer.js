@@ -24,7 +24,7 @@ server.listen(port, (err) => {
 
 const wss = new WebSocketServer({port:9000})
 wss.on('connection', async function(ws){
-    ws.send('connected')
+    ws.send(JSON.stringify({type:'connection', data: true}))
 
     var keywords = (await sqlite.all("SELECT keyword FROM keywords"))
                     .map((v,i) => v.keyword)
@@ -32,8 +32,8 @@ wss.on('connection', async function(ws){
                     .map((v,i) => v.id)
 
     ws.on('message', function(message) {
-        if(message == 'ping') ws.send('pong')
-        if(message == 'get.keywords') ws.send(JSON.stringify(keywords))
-        if(message == 'get.products') ws.send(JSON.stringify(products))
+        if(message == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
+        if(message == 'get.keywords') ws.send(JSON.stringify({type:'keywords', data:keywords}))
+        if(message == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
     })
 })

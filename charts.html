@@ -1,18 +1,91 @@
 <html>
-<head></head>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+  body {
+    font-family: 'Roboto Condensed', sans-serif;
+  }
+  ul {
+    padding:0;
+    margin:0;
+  }
+  li {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    vertical-align: middle;
+    font-size: 12px;
+    background-color: rgb(65, 65, 65);
+    border-radius: 20px;
+    padding: 3px 10px 3px 10px;
+    margin-right: 5px;
+  }
+
+  li:hover {
+    cursor: pointer;
+    background-color: rgb(53, 53, 53);
+  }
+
+  .inline {
+    display: inline;
+  }
+
+  .selectors {
+    margin-top: 5px;
+  }
+</style>
+
+<body id="app">
+    <div id="content">
+      <div class="selectors">
+        <p class="inline">Ключевые слова:</p>
+        <ul class="inline">
+          <li v-for="key in keywords">
+            {{ key }}
+          </li>
+        </ul>
+      </div>
+      <div class="selectors">
+        <p class="inline">Артикулы:</p>
+        <ul class="inline">
+          <li v-for="product in products">
+            {{ product }}
+          </li>
+        </ul>
+      </div>
+      <p>Последние позиции:</p>
+    </div>
+</body>
 <script>
-    const ws = new WebSocket("ws://127.0.0.1:9000");
-    ws.onopen = function() {
+  const app = new Vue({
+    data: () => ({
+      ping: null,
+      keywords: null,
+      products: null
+    }),
+    mounted: function(){
+      let ws = new WebSocket("ws://127.0.0.1:9000");
+      ws.onopen = function() {
         ws.send('ping')
         ws.send('get.keywords')
         ws.send('get.products')
-    };
+      };
 
-    ws.onmessage = function(event) {
-        console.log(event.data);
-    };
-</script>
-<body id="app">
-    test
-</body>
+      ws.onmessage = (event) => {
+        let data = JSON.parse(event.data)
+        console.log(data.data)
+        switch(data.type){
+          case 'ping': this.ping = true; break;
+          case 'keywords': this.keywords = data.data; break;
+          case 'products': this.products = data.data; break;
+        }
+      };
+    }
+  });
+  app.$mount("#content");
+  </script>
 </html>
