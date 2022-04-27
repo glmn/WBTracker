@@ -47,7 +47,8 @@ PRAGMA foreign_keys = on;
 - You are ready to go, just type <code>npm run scan</code> in your terminal
 
 #### How to watch positions data?
-Not implemented yet :laughing: Use your SQL skills to gather cool analytics
+- Type <code>npm run watch</code> in your terminal
+- Open your browser and visit <code>http://127.0.0.1</code>
 
 #### To-Do List
 - [ ] Implement Interactive mode
