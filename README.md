@@ -51,5 +51,6 @@ PRAGMA foreign_keys = on;
 - Open your browser and visit <code>http://127.0.0.1</code>
 
 #### To-Do List
-- [ ] Implement Interactive mode
-- [ ] Realtime Charts
+- [x] Implement Interactive mode
+- [x] Realtime Charts
+- [ ] Add <code>insert</code> and <code>remove</code> of *keywords* and *products*
