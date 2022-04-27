@@ -31,9 +31,19 @@ wss.on('connection', async function(ws){
     var products = (await sqlite.all("SELECT id FROM products"))
                     .map((v,i) => v.id)
 
-    ws.on('message', function(message) {
-        if(message == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
-        if(message == 'get.keywords') ws.send(JSON.stringify({type:'keywords', data:keywords}))
-        if(message == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
+    ws.on('message', async function(message) {
+        message = JSON.parse(message)
+        if(message.type == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
+        if(message.type == 'get.keywords') ws.send(JSON.stringify({type:'keywords', data:keywords}))
+        if(message.type == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
+        if(message.type == 'get.stats') {
+            let products = (message.data.products).join("','")
+            let keywords = (message.data.keywords).join("','")
+            let response = await sqlite.all(
+                `SELECT * FROM stats WHERE product in ('${products}') AND keyword in ('${keywords}')`
+            )
+
+            ws.send(JSON.stringify({type:'stats', data:response}))
+        }
     })
 })

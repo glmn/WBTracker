@@ -3,6 +3,7 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 </head>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
@@ -18,16 +19,36 @@
     align-items: center;
     color: white;
     vertical-align: middle;
-    font-size: 12px;
-    background-color: rgb(65, 65, 65);
-    border-radius: 20px;
-    padding: 3px 10px 3px 10px;
+    padding-bottom: 2px;
+    margin-top: 2px;
     margin-right: 5px;
   }
 
-  li:hover {
+  li .btn {
+    font-size: 10px;
+    color: #3a0078;
+    background-color: rgba(206, 210, 255, 0.575));
+    border-radius: 20px;
+    padding: 3px 10px 3px 10px;
+    border: 1.5px solid rgb(217, 204, 255);
+  }
+
+  li .btn:hover {
     cursor: pointer;
-    background-color: rgb(53, 53, 53);
+    color: #fff;
+    background-color: #3a0078;
+  }
+
+  li .active {
+    cursor: pointer;
+    color: #fff;
+    background-color: #3a0078;
+  }
+
+  li .active:hover {
+    cursor: pointer;
+    color: #fff;
+    background-color: #500a9b;
   }
 
   .inline {
@@ -37,53 +58,143 @@
   .selectors {
     margin-top: 5px;
   }
+
+  .title {
+    font-size: 11px;
+  }
+
+  .title > span {
+    font-size: 9px;
+    padding: 1px 5px 1px 5px;
+    background-color: #3a0078;
+    border-radius: 8px;
+    color: white;
+  }
 </style>
 
 <body id="app">
     <div id="content">
+      <div class="header">
+        <div class="title">wb.tracker <span>0.0.1</span></div>
+      </div>
       <div class="selectors">
         <p class="inline">Ключевые слова:</p>
         <ul class="inline">
-          <li v-for="key in keywords">
-            {{ key }}
+          <li v-for="key in keywords" @click="toggleSelectors(key)">
+            <div v-bind:class="(key.isActive) ? 'btn active' : 'btn'">{{ key.word }}</div>
           </li>
         </ul>
       </div>
       <div class="selectors">
         <p class="inline">Артикулы:</p>
         <ul class="inline">
-          <li v-for="product in products">
-            {{ product }}
+          <li v-for="product in products" @click="toggleSelectors(product)">
+            <div v-bind:class="(product.isActive) ? 'btn active' : 'btn'">{{ product.product }}</div>
           </li>
         </ul>
       </div>
       <p>Последние позиции:</p>
+      <canvas id="myChart" width="400" height="400"></canvas>
     </div>
 </body>
 <script>
   const app = new Vue({
-    data: () => ({
+    data: {
+      ws: new WebSocket("ws://127.0.0.1:9000"),
       ping: null,
-      keywords: null,
-      products: null
-    }),
+      keywords: [],
+      products: [],
+      chart: null
+    },
+    methods: {
+      toggleSelectors: function(selector){
+        selector.isActive = !selector.isActive
+        this.requestStats()
+      },
+      requestStats: function(){
+        let req = {
+          type:'get.stats',
+          data: {
+            products: (this.products).filter(obj => obj.isActive).map(el => el.product),
+            keywords: (this.keywords).filter(obj => obj.isActive).map(el => el.word),
+          }
+        }
+          console.log(req)
+        if(req.data.products.length > 0 && req.data.keywords.length > 0){
+          this.ws.send(JSON.stringify(req))
+        }
+      }
+    },
     mounted: function(){
-      let ws = new WebSocket("ws://127.0.0.1:9000");
-      ws.onopen = function() {
-        ws.send('ping')
-        ws.send('get.keywords')
-        ws.send('get.products')
+      this.ws.onopen = () => {
+        this.ws.send(JSON.stringify({type:'ping', data:''}))
+        this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
+        this.ws.send(JSON.stringify({type:'get.products', data:''}))
       };
 
-      ws.onmessage = (event) => {
+      this.ws.onmessage = (event) => {
         let data = JSON.parse(event.data)
         console.log(data.data)
         switch(data.type){
           case 'ping': this.ping = true; break;
-          case 'keywords': this.keywords = data.data; break;
-          case 'products': this.products = data.data; break;
+          case 'keywords':
+            for(key of data.data){
+              this.keywords.push({
+                word: key,
+                isActive: false
+              })
+            }
+            break;
+          case 'products':
+            for(product of data.data){
+              this.products.push({
+                product: product,
+                isActive: false
+              })
+            }
+            break;
+          case 'stats':
+            console.log(data.data)
         }
       };
+
+      this.chart = new Chart('myChart', {
+          type: 'line',
+          data: {
+              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+              datasets: [{
+                  label: 'менструальные чаши',
+                  data: [12, 19, 3, 5, 2, 3],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 2
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  },
+                  xAxes: [{
+                    type: 'time'
+                  }]
+              }
+          }
+      })
     }
   });
   app.$mount("#content");
