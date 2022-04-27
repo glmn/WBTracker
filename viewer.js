@@ -39,8 +39,15 @@ wss.on('connection', async function(ws){
         if(message.type == 'get.stats') {
             let products = (message.data.products).join("','")
             let keywords = (message.data.keywords).join("','")
+            // let response = await sqlite.all(
+            //     `SELECT * FROM stats WHERE product in ('${products}') AND keyword in ('${keywords}')`
+            // )
             let response = await sqlite.all(
-                `SELECT * FROM stats WHERE product in ('${products}') AND keyword in ('${keywords}')`
+                `select strftime('%d%H', timestamp), timestamp, position, keyword, product
+                from stats
+                WHERE product in ('${products}') AND keyword in ('${keywords}')
+                group by strftime('%d%H', timestamp), keyword, product
+                ORDER by timestamp DESC`
             )
 
             ws.send(JSON.stringify({type:'stats', data:response}))
