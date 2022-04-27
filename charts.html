@@ -3,8 +3,10 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 </head>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
   body {
@@ -94,7 +96,7 @@
         </ul>
       </div>
       <p>Последние позиции:</p>
-      <canvas id="myChart" width="400" height="400"></canvas>
+      <canvas id="myChart" width="200" height="200"></canvas>
     </div>
 </body>
 <script>
@@ -119,10 +121,80 @@
             keywords: (this.keywords).filter(obj => obj.isActive).map(el => el.word),
           }
         }
-          console.log(req)
         if(req.data.products.length > 0 && req.data.keywords.length > 0){
           this.ws.send(JSON.stringify(req))
         }
+      },
+      updateChart: function(stats){
+        labels = (this.keywords).filter(obj => obj.isActive).map(el => el.word)
+        let data = []
+
+        let datasets = []
+
+        for(stat of stats){
+          let idx = datasets.findIndex(obj => obj.label == stat.keyword)
+          if(idx == -1){
+            datasets.push({
+              label: stat.keyword,
+              data: []
+            })
+            idx = datasets.length - 1
+          }
+          datasets[idx].data.push({
+            x: stat.timestamp,
+            y: stat.position
+          })
+        }
+
+        this.chart.data.datasets = datasets
+        const zoomOptions = {
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true,
+            },
+            mode: 'xy',
+          },
+          pan: {
+            enabled: true,
+            mode: 'xy'
+          }
+        };
+        this.chart.options = {
+          animation: true,
+          responsive: true,
+          plugins: {
+            zoom: zoomOptions
+          },
+          scales: {
+              x: {
+                type: 'time',
+                ticks: {
+                  autoSkip: true,
+                  autoSkipPadding: 50,
+                  maxRotation: 0
+                },
+                time: {
+                  displayFormats: {
+                    hour: 'HH:mm',
+                    minute: 'HH:mm',
+                    second: 'HH:mm:ss'
+                  }
+                }
+              },
+              y: {
+                ticks: {
+                  reverse: true,
+                  beginAtZero: true,
+                  suggestedMin: 0
+                }
+              }
+            }
+        }
+
+        this.chart.update()
       }
     },
     mounted: function(){
@@ -155,45 +227,15 @@
             break;
           case 'stats':
             console.log(data.data)
+            this.updateChart(data.data)
+            break;
         }
       };
 
       this.chart = new Chart('myChart', {
           type: 'line',
-          data: {
-              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-              datasets: [{
-                  label: 'менструальные чаши',
-                  data: [12, 19, 3, 5, 2, 3],
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(255, 99, 132, 1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
-                  borderWidth: 2
-              }]
-          },
-          options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  },
-                  xAxes: [{
-                    type: 'time'
-                  }]
-              }
-          }
+          data: {},
+          options: {}
       })
     }
   });
