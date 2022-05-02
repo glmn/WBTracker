@@ -4,7 +4,7 @@
 <h5 align="center">:trophy:<code>Must Have <s>Weapon</s> Tool for TOP-1 on Wildberries</code></h5>
 <h5 align="center">:white_check_mark:<code>Standalone version</code></h5>
 
-<p align="center"><img img src="https://user-images.githubusercontent.com/1326151/165617303-e0619944-aa4d-46a5-92e7-54d296282cb3.png"></p>
+<p align="center"><img img src="https://user-images.githubusercontent.com/1326151/165629178-517d2722-1e30-4bc7-b92c-f18bcc85877f.png"></p>
 
 #### How to run?
 - Clone this repo ```git clone https://github.com/glmn/WBTracker.git```
@@ -47,8 +47,10 @@ PRAGMA foreign_keys = on;
 - You are ready to go, just type <code>npm run scan</code> in your terminal
 
 #### How to watch positions data?
-Not implemented yet :laughing: Use your SQL skills to gather cool analytics
+- Type <code>npm run watch</code> in your terminal
+- Open your browser and visit <code>http://127.0.0.1</code>
 
 #### To-Do List
-- [ ] Implement Interactive mode
-- [ ] Realtime Charts
+- [x] Implement Interactive mode
+- [x] Realtime Charts
+- [ ] Add <code>insert</code> and <code>remove</code> of *keywords* and *products*
