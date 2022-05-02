@@ -146,7 +146,7 @@
         }
 
         function djb2(str){
-          var hash = 5381;
+          var hash = 01001;
           for (var i = 0; i < str.length; i++) {
             hash = ((hash << 5) + hash) + str.charCodeAt(i); /* hash * 33 + c */
           }
@@ -176,12 +176,16 @@
               data: [],
               cubicInterpolationMode: 'monotone',
               tension: 0.4,
-              backgroundColor: color
+              backgroundColor: color,
+              // borderColor: color + 'ee',
+              fill: false
             })
             idx = datasets.length - 1
           }
+          let date = new Date(stat.timestamp)
+          date.setHours(date.getHours() + 3) // add 3 hours (GMT+3)
           datasets[idx].data.push({
-            x: stat.timestamp,
+            x: date,
             y: stat.position
           })
         }
@@ -203,24 +207,11 @@
             pinch: {
               enabled: true,
             },
-            mode: "xy",
+            mode: "x",
           }
         };
 
         this.chart.options = {
-          animations: {
-            y: {
-              easing: 'easeInOutElastic',
-              from: (ctx) => {
-                if (ctx.type === 'data') {
-                  if (ctx.mode === 'default' && !ctx.dropped) {
-                    ctx.dropped = true;
-                    return 0;
-                  }
-                }
-              }
-            }
-          },
           interaction: {
             intersect: false,
             mode: 'index',
@@ -247,10 +238,12 @@
                   maxRotation: 0
                 },
                 time: {
+                  tooltipFormat: 'yyyy-mm-dd HH:mm',
                   displayFormats: {
-                    hour: 'HH:mm',
-                    minute: 'HH:mm',
-                    second: 'HH:mm:ss'
+                      millisecond: 'HH:mm:ss.SSS',
+                      second: 'HH:mm:ss',
+                      minute: 'HH:mm',
+                      hour: 'HH'
                   }
                 }
               },
