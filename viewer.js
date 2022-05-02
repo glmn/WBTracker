@@ -2,20 +2,20 @@ import {WebSocketServer} from 'ws'
 import sqlite from 'aa-sqlite';
 import * as fs from 'fs'
 import http from 'http'
+import connect from 'connect'
+import serveStatic from 'serve-static'
 
+var __dirname = process.cwd();
 await sqlite.open('./main.db')
 
+/**
+ * Simple web server
+ */
 const port = 80
-const requestHandler = (req, res) => {
-    res.setHeader("Content-Type", "text/html");
-    res.writeHead(200);
-    fs.readFile("charts.html", (err, data) => res.end(data))
-}
-const server = http.createServer(requestHandler)
-server.listen(port, (err) => {
-    if (err) return console.log(err);
-});
 
+connect()
+    .use(serveStatic(__dirname))
+    .listen(port, () => console.log('Open your browser\n http://127.0.0.1'));
 
 /**
  * WebSocket server

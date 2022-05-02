@@ -1,0 +1,112 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+  body {
+    font-family: 'Roboto Condensed', sans-serif;
+    max-height: 100vh;
+  }
+  ul {
+    padding:0;
+    margin:0;
+  }
+  li {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    vertical-align: middle;
+    padding-bottom: 2px;
+    margin-top: 2px;
+    margin-right: 5px;
+  }
+
+  li .btn {
+    font-size: 12px;
+    color: #3a0078;
+    background-color: rgba(206, 210, 255, 0.575));
+    border-radius: 20px;
+    padding: 3px 10px 3px 10px;
+    border: 1.5px solid rgb(217, 204, 255);
+  }
+
+  li .btn:hover {
+    cursor: pointer;
+    color: #fff;
+    background-color: #3a0078;
+  }
+
+  li .active {
+    cursor: pointer;
+    color: #fff;
+    background-color: #3a0078;
+  }
+
+  li .active:hover {
+    cursor: pointer;
+    color: #fff;
+    background-color: #500a9b;
+  }
+
+  .inline {
+    display: inline;
+  }
+
+  .selectors {
+    margin-top: 5px;
+  }
+
+  .title {
+    font-size: 12px;
+  }
+
+  .title > span {
+    font-size: 9px;
+    padding: 1px 5px 1px 5px;
+    background-color: #3a0078;
+    border-radius: 8px;
+    color: white;
+  }
+
+  .chart {
+    position: relative;
+    height:70vh;
+    max-width:100vw;
+  }
+</style>
+
+<body id="app">
+    <div id="content">
+      <div class="header">
+        <div class="title">wb.tracker <span>0.0.1</span></div>
+      </div>
+      <div class="selectors">
+        <p class="inline">Ключевые слова:</p>
+        <ul class="inline">
+          <li v-for="key in keywords" @click="toggleSelectors(key)">
+            <div v-bind:class="(key.isActive) ? 'btn active' : 'btn'">{{ key.word }}</div>
+          </li>
+        </ul>
+      </div>
+      <div class="selectors">
+        <p class="inline">Артикулы:</p>
+        <ul class="inline">
+          <li v-for="product in products" @click="toggleSelectors(product)">
+            <div v-bind:class="(product.isActive) ? 'btn active' : 'btn'">{{ product.product }}</div>
+          </li>
+        </ul>
+      </div>
+      <p>Последние позиции:</p>
+      <div class="chart">
+        <canvas id="myChart" height="200"></canvas>
+      </div>
+    </div>
+</body>
+<script type="text/javascript" src="./app.js"></script>
+</html>
