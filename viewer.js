@@ -26,8 +26,8 @@ const wss = new WebSocketServer({port:9000})
 wss.on('connection', async function(ws){
     ws.send(JSON.stringify({type:'connection', data: true}))
 
-    var keywords = (await sqlite.all("SELECT keyword FROM keywords"))
-                    .map((v,i) => v.keyword)
+    var keywords = (await sqlite.all("SELECT * FROM keywords"))
+                    .map((v,i) => {return {key: v.keyword, total_products: v.total_products}})
     var products = (await sqlite.all("SELECT id FROM products"))
                     .map((v,i) => v.id)
 

@@ -66,7 +66,6 @@ const app = new Vue({
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
             backgroundColor: color,
-            // borderColor: color + 'ee',
             fill: false
           })
           idx = datasets.length - 1
@@ -80,45 +79,88 @@ const app = new Vue({
       }
 
       this.chart.data.datasets = datasets
-      const zoomOptions = {
-        pan: {
-            enabled: true,
-            modifierKey: "",
-          },
-        limits: {
-          y: {min:0, max:'original'},
-          x: {}
-        },
-        zoom: {
-          wheel: {
-            enabled: true,
-          },
-          pinch: {
-            enabled: true,
-          },
-          mode: "x",
-        }
-      };
+      this.chart.update()
+    }
+  },
+  mounted: function(){
+    this.ws.onopen = () => {
+      this.ws.send(JSON.stringify({type:'ping', data:''}))
+      this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
+      this.ws.send(JSON.stringify({type:'get.products', data:''}))
 
-      this.chart.options = {
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        transitions: {
-          zoom: {
-            animation: {
-              duration: 3000,
-              easing: 'easeOutCubic'
-            }
+      setInterval(() => {
+        this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
+        this.ws.send(JSON.stringify({type:'get.products', data:''}))
+      }, 1000)
+    };
+
+    this.ws.onmessage = (event) => {
+      let data = JSON.parse(event.data)
+      switch(data.type){
+        case 'ping': this.ping = true; break;
+        case 'keywords':
+          let tmpKeysArr = []
+          for(key of data.data){
+            let idx = this.keywords.findIndex(obj => obj.word == key.key)
+            tmpKeysArr.push({
+              word: key.key,
+              total_products: key.total_products,
+              isActive: (idx == -1) ? false : this.keywords[idx].isActive
+            })
           }
+          this.keywords = tmpKeysArr
+          break;
+        case 'products':
+          let tmpProductsArr = []
+          for(product of data.data){
+            let idx = this.products.findIndex(obj => obj.product == product)
+            tmpProductsArr.push({
+              product: product,
+              isActive: (idx == -1) ? false : this.products[idx].isActive
+            })
+          }
+          this.products = tmpProductsArr
+          break;
+        case 'stats':
+          this.updateChart(data.data)
+          break;
+      }
+    };
+
+    const zoomOptions = {
+      pan: {
+          enabled: true,
+          modifierKey: "",
         },
-        maintainAspectRatio: false,
-        responsive: true,
-        plugins: {
-          zoom: zoomOptions
+      limits: {
+        y: {min:0, max:'original'},
+        x: {}
+      },
+      zoom: {
+        wheel: {
+          enabled: true,
         },
-        scales: {
+        pinch: {
+          enabled: true,
+        },
+        mode: "x",
+      }
+    };
+
+    this.chart = new Chart('myChart', {
+        type: 'line',
+        data: {},
+        options: {
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: {
+            zoom: zoomOptions
+          },
+          scales: {
             x: {
               type: 'time',
               ticks: {
@@ -142,72 +184,6 @@ const app = new Vue({
               reverse: true,
             }
           }
-      }
-
-      this.chart.update()
-    }
-  },
-  mounted: function(){
-    this.ws.onopen = () => {
-      this.ws.send(JSON.stringify({type:'ping', data:''}))
-      this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
-      this.ws.send(JSON.stringify({type:'get.products', data:''}))
-    };
-
-    this.ws.onmessage = (event) => {
-      let data = JSON.parse(event.data)
-      console.log(data.data)
-      switch(data.type){
-        case 'ping': this.ping = true; break;
-        case 'keywords':
-          for(key of data.data){
-            this.keywords.push({
-              word: key,
-              isActive: false
-            })
-          }
-          break;
-        case 'products':
-          for(product of data.data){
-            this.products.push({
-              product: product,
-              isActive: false
-            })
-          }
-          break;
-        case 'stats':
-          console.log(data.data)
-          this.updateChart(data.data)
-          break;
-      }
-    };
-
-    this.chart = new Chart('myChart', {
-        type: 'line',
-        data: {},
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              zoom: {
-                pan: {
-                  enabled: true,
-                  mode: 'xy',
-                  modifierKey: 'shift',
-                  overScaleMode: 'xy'
-                },
-                limits: {
-                  y: {min:0, max:'original'},
-                  x: {min: 'original', max:'original'}
-                },
-                zoom: {
-                  wheel: {
-                    enabled: true,
-                  },
-                  mode: 'xy'
-                }
-              }
-            },
         }
     })
   }

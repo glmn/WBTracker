@@ -109,6 +109,15 @@ async function insertStats(keyword, product, position, total_products){
     }
 }
 
+async function updateKeywordTotalProducts(total_products, keyword){
+    let query = "UPDATE keywords SET total_products = ? WHERE keyword = ?"
+    try {
+        await sqlite.push(query, [...arguments])
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 async function init(keywords, products){
     for(let keyword of keywords){
 
@@ -118,11 +127,12 @@ async function init(keywords, products){
         await search.fetchData()
 
         let total_products = search.positions.length
+        await updateKeywordTotalProducts(total_products, keyword)
 
         search.positions.forEach(async function(product, idx){
             let idxFound = products.indexOf(product.id)
             if (idxFound != -1){
-                await insertStats( keyword, products[idxFound], idx+1, total_products)
+                await insertStats(keyword, products[idxFound], idx+1, total_products)
             }
         })
     }
