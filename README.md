@@ -8,6 +8,7 @@
 
 #### How to run?
 - Clone this repo ```git clone https://github.com/glmn/WBTracker.git```
+- Run <code>npm install</code> in your terminal
 - Create in root folder <code>main.db</code> file
 - With any SQL Managers open <code>main.db</code> database and execute next query 
 ```SQL
