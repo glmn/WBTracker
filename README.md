@@ -16,7 +16,8 @@ BEGIN TRANSACTION;
 
 -- Table: keywords
 CREATE TABLE keywords (
-    keyword STRING UNIQUE
+    keyword        STRING  UNIQUE,
+    total_products INT (5) 
 );
 
 
@@ -39,8 +40,6 @@ CREATE TABLE stats (
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
-
-
 ```
 - Fill <code>keywords</code> table with your keywords
 - Fill <code>products</code> table with your products SKUs
