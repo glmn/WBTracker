@@ -105,19 +105,19 @@
         <div class="title">wb.tracker <span>0.0.1</span></div>
       </div>
       <div class="selectors">
+        <p class="inline">Артикулы:</p>
+        <ul class="inline">
+          <li v-for="product in products" @click="selectSKU(product)">
+            <div v-bind:class="(product.isActive) ? 'btn active' : 'btn'">{{ product.product }}</div>
+          </li>
+        </ul>
+      </div>
+      <div v-if="keywords.length > 0" class="selectors">
         <p class="inline">Ключевые слова:</p>
         <ul class="inline">
           <li v-for="key in keywords" @click="toggleSelectors(key)">
             <div v-bind:class="(key.isActive) ? 'btn active' : 'btn'">{{ key.word }}</div>
             <span v-bind:class="(key.isActive) ? 'badge-active badge' : 'badge'">{{ key.total_products }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="selectors">
-        <p class="inline">Артикулы:</p>
-        <ul class="inline">
-          <li v-for="product in products" @click="toggleSelectors(product)">
-            <div v-bind:class="(product.isActive) ? 'btn active' : 'btn'">{{ product.product }}</div>
           </li>
         </ul>
       </div>

@@ -11,6 +11,22 @@ const app = new Vue({
       selector.isActive = !selector.isActive
       this.requestStats()
     },
+    selectSKU: function(sku){
+      this.products.forEach((el, i) => {
+        if(this.products[i] === sku){
+          this.products[i].isActive = !this.products[i].isActive
+        } else {
+          this.products[i].isActive = false
+        }
+      })
+      if(this.products.filter((v, i) => v.isActive).length > 0)
+      this.requestKeywords()
+    },
+    requestKeywords: function(){
+      this.ws.send(JSON.stringify({type:'get.keywords', data:{
+        products: (this.products).filter(obj => obj.isActive).map(el => el.product),
+      }}))
+    },
     requestStats: function(){
       let req = {
         type:'get.stats',
@@ -85,13 +101,13 @@ const app = new Vue({
   mounted: function(){
     this.ws.onopen = () => {
       this.ws.send(JSON.stringify({type:'ping', data:''}))
-      this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
+      // this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
       this.ws.send(JSON.stringify({type:'get.products', data:''}))
 
-      setInterval(() => {
-        this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
-        this.ws.send(JSON.stringify({type:'get.products', data:''}))
-      }, 1000)
+      // setInterval(() => {
+        // this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
+        // this.ws.send(JSON.stringify({type:'get.products', data:''}))
+      // }, 60000)
     };
 
     this.ws.onmessage = (event) => {
