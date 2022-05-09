@@ -54,3 +54,4 @@ PRAGMA foreign_keys = on;
 - [x] Implement Interactive mode
 - [x] Realtime Charts
 - [ ] Add <code>insert</code> and <code>remove</code> of *keywords* and *products*
+- [ ] SKU Preview - image, title, orders(?), count
