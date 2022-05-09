@@ -18,9 +18,15 @@ const app = new Vue({
         } else {
           this.products[i].isActive = false
         }
+        this.keywords.forEach((v, i) => {this.keywords[i].isActive = false})
       })
-      if(this.products.filter((v, i) => v.isActive).length > 0)
-      this.requestKeywords()
+      if(this.products.filter((v, i) => v.isActive).length > 0){
+        this.requestKeywords()
+      } else {
+        this.keywords = []
+      }
+      this.chart.data = {}
+      this.chart.update()
     },
     requestKeywords: function(){
       this.ws.send(JSON.stringify({type:'get.keywords', data:{

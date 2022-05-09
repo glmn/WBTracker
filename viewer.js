@@ -43,6 +43,8 @@ wss.on('connection', async function(ws){
             keywords = keywords.map((v) => {
                 return {key: v.keyword, total_products: v.total_products}
             })
+
+            keywords.sort((a,b) => b.total_products - a.total_products)
             ws.send(JSON.stringify({type:'keywords', data:keywords}))
         }
         if(message.type == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
