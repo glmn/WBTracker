@@ -180,7 +180,10 @@ const app = new Vue({
           maintainAspectRatio: false,
           responsive: true,
           plugins: {
-            zoom: zoomOptions
+            zoom: zoomOptions,
+            legend: {
+              display: false
+            }
           },
           scales: {
             x: {
