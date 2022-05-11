@@ -55,3 +55,4 @@ PRAGMA foreign_keys = on;
 - [x] Realtime Charts
 - [ ] Add <code>insert</code> and <code>remove</code> of *keywords* and *products*
 - [ ] SKU Preview - image, title, orders(?), count
+- [ ] Switch to MongoDB (?) - road to new Analytics abilities
