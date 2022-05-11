@@ -32,19 +32,20 @@ wss.on('connection', async function(ws){
         if(message.type == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
         if(message.type == 'get.keywords') {
             let products = (message.data.products).join("','")
-            let distinctKeys = await sqlite.all(
-                `SELECT DISTINCT keyword FROM stats
-                WHERE product in ('${products}')`
-            )
-            distinctKeys = distinctKeys.map((v) => v.keyword).join("','")
             let keywords = await sqlite.all(
-                `SELECT * FROM keywords WHERE keyword in ('${distinctKeys}')`
+                `SELECT DISTINCT keyword, total_products, position, min(position) as min, max(position) as max, max(timestamp) FROM stats WHERE product in ('${products}') GROUP BY keyword ORDER BY timestamp DESC`
             )
             keywords = keywords.map((v) => {
-                return {key: v.keyword, total_products: v.total_products}
+                return {
+                    key: v.keyword,
+                    total_products: v.total_products,
+                    min: v.min,
+                    max: v.max,
+                    position: v.position
+                }
             })
 
-            keywords.sort((a,b) => b.total_products - a.total_products)
+            keywords.sort((a,b) => a.position - b.position)
             ws.send(JSON.stringify({type:'keywords', data:keywords}))
         }
         if(message.type == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))

@@ -127,6 +127,9 @@ const app = new Vue({
             tmpKeysArr.push({
               word: key.key,
               total_products: key.total_products,
+              min: key.min,
+              max: key.max,
+              position: key.position,
               isActive: (idx == -1) ? false : this.keywords[idx].isActive
             })
           }

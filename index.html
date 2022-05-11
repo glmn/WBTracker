@@ -42,6 +42,34 @@
     background-color: #3a0078;
   }
 
+  li .btn_kw {
+    font-size: 12px;
+    font-weight: 500;
+    color: #3a0078;
+    background-color: rgba(196, 159, 255, 0.048);
+    border-radius: 10px;
+    padding: 3px 10px 3px 10px;
+    border: 1.5px solid rgb(217, 204, 255);
+  }
+
+  li .btn_kw > span {
+    color: #3a007873;
+  }
+
+  li .btn_kw:hover > span {
+    color: rgba(255, 255, 255, 0.493);
+  }
+
+  li .btn_kw > .active {
+    color: rgb(255 255 255 / 72%)
+  }
+
+  li .btn_kw:hover {
+    cursor: pointer;
+    color: #fff;
+    background-color: #3a0078;
+  }
+
   li .active {
     cursor: pointer;
     color: #fff;
@@ -53,23 +81,26 @@
     color: #fff;
     background-color: #500a9b;
   }
-
+/* 
   li > .badge {
-    position: absolute;
-    margin-top: -20px;
-    margin-left: -7px;
-    right: inherit;
     font-size: 10px;
     padding: 2px 3px 1px 3px;
     border-radius: 8px;
-    background-color: #6b4a8f;
-    color: #fff;
+    background-color: #6b4a8f !important;
+    color: #fff !important;;
   }
 
   .badge-active {
     color: #fff !important;
     border: none !important;
     background-color: #5a02b9 !important;
+  } */
+
+  .badge {
+    background-color: #6b4a8fc7;
+    border-radius: 5px;
+    padding: 0px 3px 0px 3px;
+    color: #fff;
   }
 
   .inline {
@@ -116,8 +147,12 @@
         <p class="inline">Ключевые слова:</p>
         <ul class="inline">
           <li v-for="key in keywords" @click="toggleSelectors(key)">
-            <div v-bind:class="(key.isActive) ? 'btn active' : 'btn'">{{ key.word }}</div>
-            <span v-bind:class="(key.isActive) ? 'badge-active badge' : 'badge'">{{ key.total_products }}</span>
+            <div v-bind:class="(key.isActive) ? 'btn_kw active' : 'btn_kw'">{{ key.word }}
+              <span style="display: block; font-size: 10px;" v-bind:class="(key.isActive) ? 'active' : ''">
+                <span v-bind:class="(key.isActive) ? 'badge-active badge' : 'badge'">{{ key.position }}</span>
+                {{ key.min }} — {{ key.max }} total: {{ key.total_products }}
+              </span>
+            </div>
           </li>
         </ul>
       </div>
