@@ -12,6 +12,7 @@
   body {
     font-family: 'Roboto Condensed', sans-serif;
     max-height: 100vh;
+    background-color: #251e35;
   }
   ul {
     padding:0;
@@ -29,11 +30,11 @@
 
   li .btn {
     font-size: 12px;
-    color: #3a0078;
-    background-color: rgba(206, 210, 255, 0.575));
+    color: #7b6b9d;
+    background-color: #221f36;
     border-radius: 20px;
     padding: 3px 10px 3px 10px;
-    border: 1.5px solid rgb(217, 204, 255);
+    /* border: 1.5px solid rgb(217, 204, 255); */
   }
 
   li .btn:hover {
@@ -45,19 +46,14 @@
   li .btn_kw {
     font-size: 12px;
     font-weight: 500;
-    color: #3a0078;
-    background-color: rgba(196, 159, 255, 0.048);
+    color: #eeeeee;
+    background-color: #131026;
     border-radius: 10px;
     padding: 3px 10px 3px 10px;
-    border: 1.5px solid rgb(217, 204, 255);
   }
 
   li .btn_kw > span {
-    color: #3a007873;
-  }
-
-  li .btn_kw:hover > span {
-    color: rgba(255, 255, 255, 0.493);
+    color: #6d637a;
   }
 
   li .btn_kw > .active {
@@ -81,23 +77,9 @@
     color: #fff;
     background-color: #500a9b;
   }
-/* 
-  li > .badge {
-    font-size: 10px;
-    padding: 2px 3px 1px 3px;
-    border-radius: 8px;
-    background-color: #6b4a8f !important;
-    color: #fff !important;;
-  }
-
-  .badge-active {
-    color: #fff !important;
-    border: none !important;
-    background-color: #5a02b9 !important;
-  } */
 
   .badge {
-    background-color: #6b4a8fc7;
+    background-color: #893636;
     border-radius: 5px;
     padding: 0px 3px 0px 3px;
     color: #fff;
@@ -109,6 +91,23 @@
 
   .selectors {
     margin-top: 5px;
+    color: #ffffff;
+    background-color: #28253b;
+    border-radius: 10px;
+    padding: 5px 5px 5px 10px;
+  }
+
+  .header > .title {
+    display: inline-block;
+    margin-top: 5px;
+    color: #ffffff;
+    background-color: #28253b;
+    border-radius: 10px;
+    padding: 5px 5px 5px 10px;
+  }
+
+  .selectors > p {
+    padding-right: 5px;
   }
 
   .title {
@@ -118,7 +117,7 @@
   .title > span {
     font-size: 9px;
     padding: 1px 5px 1px 5px;
-    background-color: #3a0078;
+    background-color: #5e1cc7;
     border-radius: 8px;
     color: white;
   }
@@ -156,7 +155,6 @@
           </li>
         </ul>
       </div>
-      <p>Последние позиции:</p>
       <div class="chart">
         <canvas id="myChart" height="200"></canvas>
       </div>
