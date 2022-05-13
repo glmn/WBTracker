@@ -58,7 +58,9 @@ class WBSearch {
 
         if(jsonData.data.products.length == 300){
             this.params.page += 1
-            await this.fetchData()
+            if(this.params.page <= 100){
+                await this.fetchData()
+            }
         }
     }
 }
