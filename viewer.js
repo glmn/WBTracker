@@ -1,5 +1,6 @@
 import {WebSocketServer} from 'ws'
 import sqlite from 'aa-sqlite';
+import fetch from 'node-fetch';
 import connect from 'connect'
 import serveStatic from 'serve-static'
 
@@ -47,6 +48,13 @@ wss.on('connection', async function(ws){
 
             keywords.sort((a,b) => a.position - b.position)
             ws.send(JSON.stringify({type:'keywords', data:keywords}))
+        }
+        if(message.type == 'get.product.data') {
+            let product = message.data.products[0]
+            let url = "https://wbx-content-v2.wbstatic.net/ru/" + product + ".json"
+            let response = await fetch(url)
+            let jsonData = await response.json()
+            ws.send(JSON.stringify({type: 'product.data', data: jsonData}))
         }
         if(message.type == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
         if(message.type == 'get.stats') {

@@ -4,6 +4,7 @@ const app = new Vue({
     ping: null,
     keywords: [],
     products: [],
+    productData: {},
     chart: null
   },
   methods: {
@@ -22,14 +23,21 @@ const app = new Vue({
       })
       if(this.products.filter((v, i) => v.isActive).length > 0){
         this.requestKeywords()
+        this.requestProductData()
       } else {
         this.keywords = []
+        this.productData = {}
       }
       this.chart.data = {}
       this.chart.update()
     },
     requestKeywords: function(){
       this.ws.send(JSON.stringify({type:'get.keywords', data:{
+        products: (this.products).filter(obj => obj.isActive).map(el => el.product),
+      }}))
+    },
+    requestProductData: function(){
+      this.ws.send(JSON.stringify({type:'get.product.data', data:{
         products: (this.products).filter(obj => obj.isActive).map(el => el.product),
       }}))
     },
@@ -88,6 +96,7 @@ const app = new Vue({
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
             backgroundColor: color,
+            borderColor: '#28253b',
             fill: false
           })
           idx = datasets.length - 1
@@ -145,6 +154,13 @@ const app = new Vue({
             })
           }
           this.products = tmpProductsArr
+          break;
+        case 'product.data':
+          this.productData = data.data
+          let sku = this.productData.nm_id
+          let skuArchive = parseInt(sku/10000)
+          let photoUrl = `https://images.wbstatic.net/c246x328/new/${skuArchive}0000/${sku}-1.jpg`
+          this.productData.photoUrl = photoUrl
           break;
         case 'stats':
           this.updateChart(data.data)
