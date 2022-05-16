@@ -123,7 +123,7 @@ async function updateKeywordTotalProducts(total_products, keyword){
 async function init(keywords, products){
     let timer = 0
     for(let keyword of keywords){
-        timer += 100
+        timer += 150
         setTimeout(async function() {
             let key = new WBKeyword(keyword)
             await key.fetchData()

@@ -33,20 +33,21 @@ wss.on('connection', async function(ws){
         if(message.type == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
         if(message.type == 'get.keywords') {
             let products = (message.data.products).join("','")
-            let distinctKeys = await sqlite.all(
-                `SELECT keyword FROM keywords`
-            )
-            distinctKeys = distinctKeys.map((v) => v.keyword).join("','")
+            let activeKeys = await sqlite.all(`SELECT keyword FROM keywords`)
+            activeKeys = activeKeys.map((v) => v.keyword)
+
             let keywords = await sqlite.all(
-                `SELECT DISTINCT keyword, total_products, position, min(position) as min, max(position) as max, max(timestamp) FROM stats WHERE product in ('${products}') AND keyword in ('${distinctKeys}') GROUP BY keyword ORDER BY timestamp DESC`
+                `SELECT DISTINCT keyword, total_products, position, min(position) as min, max(position) as max, max(timestamp) FROM stats WHERE product in ('${products}') GROUP BY keyword ORDER BY timestamp DESC`
             )
             keywords = keywords.map((v) => {
+                let isActive = (activeKeys.indexOf(v.keyword) > -1) ? true : false
                 return {
                     key: v.keyword,
                     total_products: v.total_products,
                     min: v.min,
                     max: v.max,
-                    position: v.position
+                    position: v.position,
+                    show: isActive
                 }
             })
 

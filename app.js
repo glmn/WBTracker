@@ -139,6 +139,7 @@ const app = new Vue({
               min: key.min,
               max: key.max,
               position: key.position,
+              show: key.show,
               isActive: (idx == -1) ? false : this.keywords[idx].isActive
             })
           }

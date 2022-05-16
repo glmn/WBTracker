@@ -217,9 +217,9 @@
         </div>
       </div>
       <div v-if="keywords.length > 0" class="selectors">
-        <p class="inline">Ключевые слова:</p>
+        <p class="inline">Ключевые слова ({{ keywords.length }}):</p>
         <ul class="inline">
-          <li v-for="key in keywords" @click="toggleSelectors(key)">
+          <li v-for="key in keywords" v-if="key.show" @click="toggleSelectors(key)">
             <div v-bind:class="(key.isActive) ? 'btn_kw active' : 'btn_kw'">{{ key.word }}
               <span style="display: block; font-size: 10px;" v-bind:class="(key.isActive) ? 'active' : ''">
                 <span v-bind:class="(key.isActive) ? 'badge-active badge' : 'badge'">{{ key.position }}</span>
