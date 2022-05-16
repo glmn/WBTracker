@@ -1,6 +1,7 @@
+var wsHost = new URL(window.location).hostname
 const app = new Vue({
   data: {
-    ws: new WebSocket("ws://127.0.0.1:9000"),
+    ws: new WebSocket("ws://"+ wsHost +":9000"),
     ping: null,
     keywords: [],
     products: [],
