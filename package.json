@@ -5,6 +5,7 @@
   "description": "Wildberries search positions tracker",
   "main": "index.js",
   "scripts": {
+    "postinstall": "node install.js",
     "scan": "node fetcher.js",
     "watch": "node viewer.js"
   },
