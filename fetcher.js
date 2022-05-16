@@ -84,13 +84,13 @@ class WBSearch {
     var startTime = new Date().toLocaleString()
 
     showInfo(checksCount, startTime, 'Сканирую')
-    await init(keywords, products)
+    await init()
     checksCount++
     showInfo(checksCount, startTime, 'Отдыхаю')
 
     setInterval(async function(){
         showInfo(checksCount, startTime, 'Сканирую')
-        await init(keywords, products)
+        await init()
         checksCount++
         showInfo(checksCount, startTime, 'Отдыхаю')
     }, interval)
@@ -120,7 +120,11 @@ async function updateKeywordTotalProducts(total_products, keyword){
     }
 }
 
-async function init(keywords, products){
+async function init(){
+    var keywords = (await sqlite.all("SELECT keyword FROM keywords"))
+                    .map((v,i) => v.keyword)
+    var products = (await sqlite.all("SELECT id FROM products"))
+                    .map((v,i) => v.id)
     let timer = 0
     for(let keyword of keywords){
         timer += 150

@@ -37,6 +37,23 @@
     /* border: 1.5px solid rgb(217, 204, 255); */
   }
 
+  li .btn-add {
+    font-size: 12px;
+    color: #f1f1f1;
+    border-radius: 8px;
+    padding: 3px 7px 3px 7px;
+    -webkit-box-shadow: 0px 0px 8px 2px rgb(34 60 80 / 28%);
+    -moz-box-shadow: 0px 0px 8px 2px rgba(34, 60, 80, 0.28);
+    box-shadow: 0px 0px 7px -1px rgb(94 28 199);
+    border: 1.5px solid #221f36;
+  }
+
+  li .btn-add:hover {
+    cursor: pointer;
+    color: #fff;
+    background-color: #3a0078;
+  }
+
   li .btn:hover {
     cursor: pointer;
     color: #fff;
@@ -177,6 +194,19 @@
     -moz-box-shadow: 0px 0px 13px 0px rgb(94 28 199);
     box-shadow: 0px 0px 13px 0px rgb(94 28 199);
   }
+
+  #product-input {
+    font-size: 12px;
+    color: #f1f1f1;
+    border-radius: 8px;
+    padding: 3px 7px 3px 7px;
+    -webkit-box-shadow: 0px 0px 8px 2px rgb(34 60 80 / 28%);
+    -moz-box-shadow: 0px 0px 8px 2px rgba(34, 60, 80, 0.28);
+    box-shadow: 0px 0px 7px -1px rgb(94 28 199);
+    border: 1.5px solid #221f36;
+    background: #221f36;
+    margin-left: 10px;
+  }
 </style>
 
 <body id="app">
@@ -189,6 +219,12 @@
         <ul class="inline">
           <li v-for="product in products" @click="selectSKU(product)">
             <div v-bind:class="(product.isActive) ? 'btn active' : 'btn'">{{ product.product }}</div>
+          </li>
+          <li>
+            <div class="btn-add" @click="toggleProductInput()">+</div>
+            <div class="add-input" v-if="showProductInput">
+              <input type="text" id="product-input" v-model="productInput" v-on:keyup.enter="submitProduct"></input>
+            </div>
           </li>
         </ul>
       </div>
@@ -216,7 +252,7 @@
           </div>
         </div>
       </div>
-      <div v-if="keywords.length > 0" class="selectors">
+      <div v-if="productData.nm_id" class="selectors">
         <p class="inline">Ключевые слова ({{ keywords.length }}):</p>
         <ul class="inline">
           <li v-for="key in keywords" v-if="key.show" @click="toggleSelectors(key)">
@@ -225,6 +261,12 @@
                 <span v-bind:class="(key.isActive) ? 'badge-active badge' : 'badge'">{{ key.position }}</span>
                 {{ key.min }} — {{ key.max }} total: {{ key.total_products }}
               </span>
+            </div>
+          </li>
+          <li>
+            <div class="btn-add" @click="toggleKeywordInput()">+</div>
+            <div class="add-input" v-if="showKeywordInput">
+              <input type="text" id="product-input" v-model="keywordInput" v-on:keyup.enter="submitKeyword"></input>
             </div>
           </li>
         </ul>

@@ -21,6 +21,7 @@
 #### To-Do List
 - [x] Implement Interactive mode
 - [x] Realtime Charts
-- [ ] Add <code>insert</code> and <code>remove</code> of *keywords* and *products*
-- [ ] SKU Preview - image, title, orders(?), count
+- [x] Implement <code>insert</code> of *keywords* and *products*
+- [ ] Implement <code>remove</code> of *keywords* and *products*
+- [x] SKU Preview - image, title, orders(?), count
 - [ ] Switch to MongoDB (?) - road to new Analytics abilities

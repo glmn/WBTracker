@@ -5,9 +5,36 @@ const app = new Vue({
     keywords: [],
     products: [],
     productData: {},
-    chart: null
+    chart: null,
+    showProductInput: false,
+    showKeywordInput: false,
+    productInput: '',
+    keywordInput: '',
   },
   methods: {
+    submitProduct: function(){
+      this.productInput = parseInt(this.productInput)
+      if(typeof this.productInput == 'number'){
+        this.ws.send(JSON.stringify({type:'add.product', data:{
+          product: this.productInput
+        }}))
+        this.productInput = ''
+        this.toggleProductInput()
+      }
+    },
+    toggleProductInput: function(){
+      this.showProductInput = !this.showProductInput
+    },
+    submitKeyword: function(){
+        this.ws.send(JSON.stringify({type:'add.keyword', data:{
+          keyword: this.keywordInput
+        }}))
+        this.keywordInput = ''
+        this.toggleKeywordInput()
+    },
+    toggleKeywordInput: function(){
+      this.showKeywordInput = !this.showKeywordInput
+    },
     toggleSelectors: function(selector){
       selector.isActive = !selector.isActive
       this.requestStats()
@@ -116,13 +143,7 @@ const app = new Vue({
   mounted: function(){
     this.ws.onopen = () => {
       this.ws.send(JSON.stringify({type:'ping', data:''}))
-      // this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
       this.ws.send(JSON.stringify({type:'get.products', data:''}))
-
-      // setInterval(() => {
-        // this.ws.send(JSON.stringify({type:'get.keywords', data:''}))
-        // this.ws.send(JSON.stringify({type:'get.products', data:''}))
-      // }, 60000)
     };
 
     this.ws.onmessage = (event) => {

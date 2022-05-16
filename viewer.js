@@ -75,5 +75,20 @@ wss.on('connection', async function(ws){
 
             ws.send(JSON.stringify({type:'stats', data:response}))
         }
+
+        if(message.type == 'add.product') {
+            let product = message.data.product
+            let insert = `INSERT INTO products VALUES(?)`
+            await sqlite.push(insert, product)
+            products.push(product)
+            ws.send(JSON.stringify({type:'products', data:products}))
+        }
+
+        if(message.type == 'add.keyword') {
+            let keyword = message.data.keyword
+            console.log(keyword)
+            let insert = `INSERT INTO keywords (keyword) VALUES(?)`
+            await sqlite.push(insert, keyword)
+        }
     })
 })
