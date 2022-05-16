@@ -121,22 +121,25 @@ async function updateKeywordTotalProducts(total_products, keyword){
 }
 
 async function init(keywords, products){
+    let timer = 0
     for(let keyword of keywords){
+        timer += 100
+        setTimeout(async function() {
+            let key = new WBKeyword(keyword)
+            await key.fetchData()
+            let search = new WBSearch(key)
+            await search.fetchData()
 
-        let key = new WBKeyword(keyword)
-        await key.fetchData()
-        let search = new WBSearch(key)
-        await search.fetchData()
+            let total_products = search.positions.length
+            await updateKeywordTotalProducts(total_products, keyword)
 
-        let total_products = search.positions.length
-        await updateKeywordTotalProducts(total_products, keyword)
-
-        search.positions.forEach(async function(product, idx){
-            let idxFound = products.indexOf(product.id)
-            if (idxFound != -1){
-                await insertStats(keyword, products[idxFound], idx+1, total_products)
-            }
-        })
+            search.positions.forEach(async function(product, idx){
+                let idxFound = products.indexOf(product.id)
+                if (idxFound != -1){
+                    await insertStats(keyword, products[idxFound], idx+1, total_products)
+                }
+            })
+        }, timer)
     }
 }
 
