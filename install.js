@@ -37,5 +37,15 @@ import sqlite from 'aa-sqlite'
         );`
     )
     console.log('Created table stats')
+
+    await sqlite.push(`
+        CREATE TABLE product_stats (
+            product_id INTEGER,
+            timestamp  DATE    DEFAULT (CURRENT_TIMESTAMP),
+            data       TEXT
+        );`
+    )
+    console.log('Created table product_stats')
+
     console.log('Ready to go!')
 })()
