@@ -66,10 +66,10 @@ wss.on('connection', async function(ws){
             let products = (message.data.products).join("','")
             let keywords = (message.data.keywords).join("','")
             let response = await sqlite.all(
-                `select strftime('%d%H', timestamp), timestamp, position, keyword, product, total_products
+                `select strftime('%m%d%H', timestamp), timestamp, position, keyword, product, total_products
                 from stats
                 WHERE product in ('${products}') AND keyword in ('${keywords}')
-                group by strftime('%d%H', timestamp), keyword, product
+                group by strftime('%m%d%H', timestamp), keyword, product
                 ORDER by timestamp DESC`
             )
 
