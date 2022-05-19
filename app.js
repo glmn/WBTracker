@@ -195,6 +195,7 @@ const app = new Vue({
       pan: {
           enabled: true,
           modifierKey: "",
+          mode: "xy",
         },
       limits: {
         y: {min:0, max:'original'},
@@ -231,7 +232,7 @@ const app = new Vue({
             x: {
               type: 'time',
               ticks: {
-                autoSkip: true,
+                // autoSkip: true,
                 autoSkipPadding: 50,
                 maxRotation: 0
               },

@@ -6,6 +6,20 @@ import {Loader, Aphorism} from 'loader-in-console';
 
 await sqlite.open('./main.db')
 
+class WBProduct {
+    constructor(product){
+        this.sku = product
+        this.data = ''
+    }
+
+    async fetchData(){
+        let url = "https://wbx-content-v2.wbstatic.net/ru/" + this.sku + ".json"
+        let response = await fetch(url)
+        let jsonData = await response.json()
+        this.data = jsonData
+    }
+}
+
 class WBKeyword {
     constructor(keyword){
         this.keyword = keyword
@@ -111,6 +125,26 @@ async function insertStats(keyword, product, position, total_products){
     }
 }
 
+async function insertProductStats(product, data){
+    let insert = 'INSERT INTO product_stats(product_id, data) VALUES(?,?)'
+    let response = await sqlite.all(`SELECT * FROM product_stats WHERE product_id = '${product}' ORDER BY timestamp DESC LIMIT 1`)
+    if (response.length == 0){
+        try {
+            await sqlite.push(insert, [...arguments])
+        } catch (err) {
+            console.log(err)
+        }
+    } else {
+        if (response[0].data != data){
+            try {
+                await sqlite.push(insert, [...arguments])
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    }
+}
+
 async function updateKeywordTotalProducts(total_products, keyword){
     let query = "UPDATE keywords SET total_products = ? WHERE keyword = ?"
     try {
@@ -125,7 +159,17 @@ async function init(){
                     .map((v,i) => v.keyword)
     var products = (await sqlite.all("SELECT id FROM products"))
                     .map((v,i) => v.id)
+
     let timer = 0
+    for(let sku of products){
+        timer += 150
+        setTimeout(async function(){
+            let product = new WBProduct(sku)
+            await product.fetchData()
+            insertProductStats(product.sku, JSON.stringify(product.data))
+        })
+    }
+
     for(let keyword of keywords){
         timer += 150
         setTimeout(async function() {
