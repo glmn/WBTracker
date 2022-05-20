@@ -1,13 +1,14 @@
 {
   "name": "wbtracker",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4a",
   "description": "Wildberries search positions tracker",
   "main": "index.js",
   "scripts": {
     "postinstall": "node install.js",
     "scan": "node --no-deprecation fetcher.js",
-    "watch": "node --no-deprecation viewer.js"
+    "watch": "node --no-deprecation viewer.js",
+    "migrate": "node --no-deprecation migrate.js"
   },
   "repository": {
     "type": "git",

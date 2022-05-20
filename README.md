@@ -18,6 +18,9 @@
 - Type <code>npm run watch</code> in your terminal
 - Open your browser and visit <code>http://127.0.0.1</code>
 
+#### Migrate from v0.0.3 to v0.0.4
+- Type <code>npm run migrate</code> in your terminal
+
 #### To-Do List
 - [x] Implement Interactive mode
 - [x] Realtime Charts
