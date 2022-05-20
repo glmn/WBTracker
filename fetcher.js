@@ -125,8 +125,8 @@ async function insertStats(keyword, product, position, total_products){
     }
 }
 
-async function insertProductStats(product, data){
-    let insert = 'INSERT INTO product_stats(product_id, data) VALUES(?,?)'
+async function insertProductStats(product, data, imageBase64){
+    let insert = 'INSERT INTO product_stats(product_id, data, image) VALUES(?,?,?)'
     let response = await sqlite.all(`SELECT * FROM product_stats WHERE product_id = '${product}' ORDER BY timestamp DESC LIMIT 1`)
     if (response.length == 0){
         try {
@@ -135,7 +135,7 @@ async function insertProductStats(product, data){
             console.log(err)
         }
     } else {
-        if (response[0].data != data){
+        if (response[0].data != data || response[0].image != imageBase64){
             try {
                 await sqlite.push(insert, [...arguments])
             } catch (err) {
@@ -166,7 +166,12 @@ async function init(){
         setTimeout(async function(){
             let product = new WBProduct(sku)
             await product.fetchData()
-            insertProductStats(product.sku, JSON.stringify(product.data))
+            let skuArchive = parseInt(sku/10000)
+            let random = Date.now()
+            let photoUrl = `http://img1.wbstatic.net/small/new/${skuArchive}0000/${sku}.jpg?r=${random}`
+            let response = await fetch(photoUrl)
+            let imageBase64 = (await response.buffer()).toString('base64');
+            insertProductStats(product.sku, JSON.stringify(product.data), imageBase64)
         })
     }
 

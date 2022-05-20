@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "node install.js",
-    "scan": "node fetcher.js",
-    "watch": "node viewer.js"
+    "scan": "node --no-deprecation fetcher.js",
+    "watch": "node --no-deprecation viewer.js"
   },
   "repository": {
     "type": "git",

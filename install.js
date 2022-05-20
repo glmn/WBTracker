@@ -42,7 +42,8 @@ import sqlite from 'aa-sqlite'
         CREATE TABLE product_stats (
             product_id INTEGER,
             timestamp  DATE    DEFAULT (CURRENT_TIMESTAMP),
-            data       TEXT
+            data       TEXT,
+            image      TEXT
         );`
     )
     console.log('Created table product_stats')
