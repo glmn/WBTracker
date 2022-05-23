@@ -6,7 +6,7 @@
 <h5 align="center">:trophy:<code>Must Have <s>Weapon</s> Tool for TOP-1 on Wildberries</code></h5>
 <h5 align="center">:white_check_mark:<code>Standalone version</code></h5>
 
-<p align="center"><img img src="https://user-images.githubusercontent.com/1326151/168189382-8e579f3d-3430-405a-8ea5-140c01918599.png"></p>
+<p align="center"><img img src="https://user-images.githubusercontent.com/1326151/169816090-6a712134-a1e3-4521-a7c4-b3b3f5a054ef.png"></p>
 
 #### How to run?
 - Clone this repo ```git clone https://github.com/glmn/WBTracker.git```
