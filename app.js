@@ -120,7 +120,8 @@ const app = new Vue({
           idx = datasets.length - 1
         }
         let date = new Date(stat.timestamp)
-        date.setHours(date.getHours() + 3) // add 3 hours (GMT+3)
+        date.setHours(date.getHours() + 3)
+        console.log(stat.timestamp, date.toLocaleString())
         datasets[idx].data.push({
           x: date,
           y: stat.position
@@ -146,7 +147,7 @@ const app = new Vue({
       diff.forEach((product_stat, idx) => {
         if(idx == 0) return
         let date = new Date(product_stat.timestamp)
-        date.setHours(date.getHours() + 3) // add 3 hours (GMT+3)
+        date.setHours(date.getHours() + 3)
         datasets[datasets.length-1].data.push({
           x: date,
           y: 1
@@ -399,18 +400,18 @@ const app = new Vue({
             x: {
               type: 'time',
               ticks: {
-                // autoSkip: true,
+                autoSkip: true,
                 autoSkipPadding: 50,
                 maxRotation: 0
               },
               time: {
-                tooltipFormat: 'yyyy-mm-dd HH:mm',
-                displayFormats: {
-                    millisecond: 'HH:mm:ss.SSS',
-                    second: 'HH:mm:ss',
-                    minute: 'HH:mm',
-                    hour: 'HH'
-                }
+                tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+                // displayFormats: {
+                //     millisecond: 'HH:mm:ss.SSS',
+                //     second: 'HH:mm:ss',
+                //     minute: 'HH:mm',
+                //     hour: 'HH'
+                // }
               }
             },
             y: {
