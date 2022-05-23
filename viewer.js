@@ -93,7 +93,11 @@ wss.on('connection', async function(ws){
             let keyword = message.data.keyword
             console.log(keyword)
             let insert = `INSERT INTO keywords (keyword) VALUES(?)`
-            await sqlite.push(insert, keyword)
+            try {
+                await sqlite.push(insert, keyword)
+            } catch (e) {
+                console.log(e)
+            }
         }
     })
 })
