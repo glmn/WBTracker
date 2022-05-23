@@ -81,7 +81,7 @@ const app = new Vue({
         this.ws.send(JSON.stringify(req))
       }
     },
-    updateChart: function(stats){
+    updateChart: function(stats, diff){
 
       function djb2(str){
         var hash = 01001;
@@ -113,7 +113,6 @@ const app = new Vue({
             label: stat.keyword,
             data: [],
             cubicInterpolationMode: 'monotone',
-            tension: 0.4,
             backgroundColor: color,
             borderColor: '#28253b',
             fill: false
@@ -127,6 +126,33 @@ const app = new Vue({
           y: stat.position
         })
       }
+      diff = diff.map((v) => {v.data = JSON.parse(v.data); return v})
+      console.log(recursiveDiff.getDiff(diff[0], diff[1], true))
+
+      datasets.push({
+        label: 'Изменения карточки',
+        data: [],
+        diffData: [],
+        isDiffData: true,
+        backgroundColor: '#a400ff',
+        borderColor: '#7b6b9d',
+        borderDash: [10,5],
+        pointStyle: 'rectRot',
+        pointRadius: 8,
+        pointBorderColor: '#000000',
+        fill: false
+      })
+
+      diff.forEach((product_stat, idx) => {
+        if(idx == 0) return
+        let date = new Date(product_stat.timestamp)
+        date.setHours(date.getHours() + 3) // add 3 hours (GMT+3)
+        datasets[datasets.length-1].data.push({
+          x: date,
+          y: 1
+        })
+        datasets[datasets.length-1].diffData.push(recursiveDiff.getDiff(diff[idx], diff[idx-1], true))
+      })
 
       this.chart.data.datasets = datasets
       this.chart.update()
@@ -177,10 +203,155 @@ const app = new Vue({
           this.productData.photoUrl = photoUrl
           break;
         case 'stats':
-          this.updateChart(data.data)
+          this.updateChart(data.data, data.productDiff)
           break;
       }
     };
+
+    const getOrCreateTooltip = (chart) => {
+      let tooltipEl = chart.canvas.parentNode.querySelector('div');
+
+      if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.style.opacity = 1;
+        tooltipEl.classList.add('tooltip-div')
+        const table = document.createElement('table');
+        tooltipEl.appendChild(table);
+        chart.canvas.parentNode.appendChild(tooltipEl);
+      }
+
+      return tooltipEl;
+    };
+
+    const externalTooltipHandler = (context) => {
+      // Tooltip Element
+      const {chart, tooltip} = context;
+      const tooltipEl = getOrCreateTooltip(chart);
+
+      // Hide if no tooltip
+      if (tooltip.opacity === 0) {
+        tooltipEl.style.opacity = 0;
+        return;
+      }
+
+      // Set Text
+      if (tooltip.body) {
+        const titleLines = tooltip.title || [];
+        const bodyLines = tooltip.body.map(b => b.lines);
+
+        const tableHead = document.createElement('thead');
+
+        titleLines.forEach(title => {
+          const tr = document.createElement('tr');
+          const th = document.createElement('th');
+          const text = document.createTextNode(title);
+
+          th.appendChild(text);
+          tr.appendChild(th);
+          tableHead.appendChild(tr);
+        });
+
+        const tableBody = document.createElement('tbody');
+        bodyLines.forEach((body, i) => {
+
+          // MY PART -------
+          let dataIndex = tooltip.dataPoints[i].dataIndex
+          let dataset = tooltip.dataPoints[i].dataset
+          if('diffData' in dataset){
+            let diffData = dataset.diffData[dataIndex]
+            let blackPaths = ['timestamp', 'ao_id']
+            let whitePaths = ['description']
+            diffData.forEach((diff,i) => {
+              console.log(diff)
+              const tr = document.createElement('tr');
+              const td = document.createElement('td');
+
+              if(blackPaths.some(r => diff.path.includes(r))) return;
+              if(diff.path[0] == 'image'){
+                let newImage = (document.createElement('img'))
+                newImage.setAttribute("src","data:image/png;base64," + diff.val);
+                let oldImage = (document.createElement('img'))
+                oldImage.setAttribute("src","data:image/png;base64," + diff.oldVal);
+
+                console.log(newImage)
+                td.appendChild(oldImage);
+                tr.appendChild(td);
+                td.appendChild(newImage);
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+              }
+
+              if(diff.op == 'add'){
+                td.innerHTML = '<span class="add-badge">New</span>'
+                tr.appendChild(td);
+                td.innerHTML = diff.val;
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+              }
+
+              if(diff.op == 'delete'){
+                td.innerHTML = '<span class="del-badge">Del</span>'
+                tr.appendChild(td);
+                td.innerHTML = diff.val;
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+              }
+
+              let dmp = new diff_match_patch()
+              let diffResult = dmp.diff_main(diff.val, diff.oldVal)
+              dmp.diff_cleanupSemantic(diffResult)
+              let diffHtml = dmp.diff_prettyHtml(diffResult)
+              const span = document.createElement('span');
+              td.appendChild(span);
+              td.innerHTML = diffHtml
+              tr.appendChild(td);
+              tableBody.appendChild(tr);
+            })
+            return;
+          }
+          // -------
+
+          const colors = tooltip.labelColors[i];
+
+          const span = document.createElement('span');
+          span.classList.add('linecolor')
+          span.style.background = colors.backgroundColor;
+          span.style.borderColor = colors.borderColor;
+
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          const text = document.createTextNode(body);
+
+          td.appendChild(span);
+          td.appendChild(text);
+          tr.appendChild(td);
+          tableBody.appendChild(tr);
+        });
+
+        const tableRoot = tooltipEl.querySelector('table');
+
+        // Remove old children
+        while (tableRoot.firstChild) {
+          tableRoot.firstChild.remove();
+        }
+
+        // Add new children
+        tableRoot.appendChild(tableHead);
+        tableRoot.appendChild(tableBody);
+      }
+
+      const {offsetLeft: positionX, offsetTop: positionY} = chart.canvas;
+
+      // Display, position, and set styles for font
+      tooltipEl.style.opacity = 1;
+      tooltipEl.style.left = positionX + tooltip.caretX + 'px'; //(tooltipEl.clientWidth/2) + 50
+      tooltipEl.style.top = positionY + tooltip.caretY + 'px'; //50
+      tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+    };
+
 
     const zoomOptions = {
       pan: {
@@ -209,7 +380,7 @@ const app = new Vue({
         options: {
           interaction: {
             intersect: false,
-            mode: 'index',
+            mode: 'nearest',
           },
           maintainAspectRatio: false,
           responsive: true,
@@ -217,6 +388,11 @@ const app = new Vue({
             zoom: zoomOptions,
             legend: {
               display: false
+            },
+            tooltip: {
+              enabled: false,
+              position: 'nearest',
+              external: externalTooltipHandler
             }
           },
           scales: {
