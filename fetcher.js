@@ -1,23 +1,90 @@
 import fetch from 'node-fetch';
 import sqlite from 'aa-sqlite';
 import log from 'log-beautify';
-import {Loader, Aphorism} from 'loader-in-console';
-
 
 await sqlite.open('./main.db')
+
 
 class WBProduct {
     constructor(product){
         this.sku = product
+        this.imageBase64 = ''
         this.data = ''
     }
 
     async fetchData(){
         let url = "https://wbx-content-v2.wbstatic.net/ru/" + this.sku + ".json"
-        let response = await fetch(url)
-        let jsonData = await response.json()
-        this.data = jsonData
+        try{
+            let response = await fetch(url)
+            let jsonData = await response.json()
+            this.data = jsonData
+        } catch (err) {
+            console.log(err)
+            await this.fetchData()
+        }
     }
+
+    async fetchImage(){
+        let skuArchive = parseInt(this.sku/10000)
+        let random = Date.now()
+        let imageUrl = `https://images.wbstatic.net/c246x328/new/${skuArchive}0000/${this.sku}-1.jpg?r=${random}`
+        try{
+            let response = await fetch(imageUrl)
+            this.imageBase64 = (await response.buffer()).toString('base64')
+        } catch (err) {
+            console.log(imageUrl)
+            await this.fetchImage()
+        }
+    }
+
+    async fetchStocks(){
+        let params = {
+            'appType': '64',
+            'spp': '0',
+            'dest': '-1255563,-1278703,-102269,-1029256',
+            'regions': '83,75,64,4,38,30,33,70,71,22,31,66,68,40,48,1,69,80',
+            'stores': '117673,122258,122259,125238,125239,125240,6159,507,3158,117501,120602,120762,6158,121709,124731,159402,2737,130744,117986,1733,686,132043',
+            'pricemarginCoeff': '1',
+            'pricemarginMin': '0',
+            'pricemarginMax': '0',
+            'reg': '0',
+            'emp': '0',
+            'lang': 'ru',
+            'locale': 'ru',
+            'version': '3',
+            'nm': this.sku
+        }
+
+        let queryParams = new URLSearchParams(params).toString()
+        let url = 'https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog?' + queryParams
+        try {
+            this.response = await fetch(url)
+            this.data.stocks = (await this.response.json()).data.products[0].sizes[0].stocks
+        } catch (err) {
+            console.log(url, err, this.data.stocks)
+            await this.fetchStocks()
+        }
+    }
+
+    async fetchDetails(){
+        let params = {
+            'pricemarginCoeff': '1',
+            'locale': 'ru',
+            'nm': this.sku
+        }
+
+        let queryParams = new URLSearchParams(params).toString()
+        let url = 'https://card.wb.ru/cards/detail?' + queryParams
+        try {
+            this.response = await fetch(url)
+            this.data.details = (await this.response.json()).data.products[0].sizes[0].stocks
+        } catch (err) {
+            console.log(err)
+            await this.fetchDetails()
+        }
+    }
+
+
 }
 
 class WBKeyword {
@@ -28,12 +95,16 @@ class WBKeyword {
     }
 
     async fetchData(){
-        let url = "https://wbxsearch.wildberries.ru/exactmatch/v2/female?query=" + encodeURI(this.keyword)
-        let response = await fetch(url)
-        let jsonData = await response.json()
-
-        this.query = jsonData.query
-        this.shardKey = jsonData.shardKey
+        let url = "https://search.wb.ru/exactmatch/ru/female/v4/search?&resultset=catalog&query=" + encodeURI(this.keyword)
+        try {
+            let response = await fetch(url)
+            let jsonData = await response.json()
+            this.query = jsonData.query
+            this.shardKey = jsonData.shardKey
+        } catch (err) {
+            console.log(err)
+            await this.fetchData()
+        }
     }
 }
 
@@ -66,15 +137,20 @@ class WBSearch {
     async fetchData(){
         let queryParams = new URLSearchParams(this.params).toString()
         let url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + queryParams + '&' + this.keyword.query
-        let response = await fetch(url)
-        let jsonData = await response.json()
-        this.positions.push(...jsonData.data.products)
+        try {
+            let response = await fetch(url)
+            let jsonData = await response.json()
+            this.positions.push(...jsonData.data.products)
 
-        if(jsonData.data.products.length == 300){
-            this.params.page += 1
-            if(this.params.page <= 100){
-                await this.fetchData()
+            if(jsonData.data.products.length == 300){
+                this.params.page += 1
+                if(this.params.page <= 100){
+                    await this.fetchData()
+                }
             }
+        } catch (err) {
+            console.log(err)
+            await this.fetchData()
         }
     }
 }
@@ -145,8 +221,8 @@ async function insertProductStats(product, data, imageBase64){
     }
 }
 
-async function updateKeywordTotalProducts(total_products, keyword){
-    let query = "UPDATE keywords SET total_products = ? WHERE keyword = ?"
+async function updateKeywordTotalProducts(total_products, _query, keyword){
+    let query = "UPDATE keywords SET total_products = ? , query = ? WHERE keyword = ?"
     try {
         await sqlite.push(query, [...arguments])
     } catch (err) {
@@ -166,12 +242,10 @@ async function init(){
         setTimeout(async function(){
             let product = new WBProduct(sku)
             await product.fetchData()
-            let skuArchive = parseInt(sku/10000)
-            let random = Date.now()
-            let photoUrl = `http://img1.wbstatic.net/small/new/${skuArchive}0000/${sku}.jpg?r=${random}`
-            let response = await fetch(photoUrl)
-            let imageBase64 = (await response.buffer()).toString('base64');
-            insertProductStats(product.sku, JSON.stringify(product.data), imageBase64)
+            await product.fetchImage()
+            await product.fetchStocks()
+            await product.fetchDetails()
+            insertProductStats(product.sku, JSON.stringify(product.data), product.imageBase64)
         })
     }
 
@@ -184,7 +258,7 @@ async function init(){
             await search.fetchData()
 
             let total_products = search.positions.length
-            await updateKeywordTotalProducts(total_products, keyword)
+            await updateKeywordTotalProducts(total_products, key.query, keyword)
 
             search.positions.forEach(async function(product, idx){
                 let idxFound = products.indexOf(product.id)

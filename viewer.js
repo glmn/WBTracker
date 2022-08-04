@@ -3,6 +3,7 @@ import sqlite from 'aa-sqlite';
 import fetch from 'node-fetch';
 import connect from 'connect'
 import serveStatic from 'serve-static'
+import moment from 'moment'
 
 var __dirname = process.cwd();
 await sqlite.open('./main.db')
@@ -33,11 +34,26 @@ wss.on('connection', async function(ws){
         if(message.type == 'ping') ws.send(JSON.stringify({type:'ping', data:'pong'}))
         if(message.type == 'get.keywords') {
             let products = (message.data.products).join("','")
-            let activeKeys = await sqlite.all(`SELECT keyword FROM keywords`)
+            let activeKeys = await sqlite.all(`SELECT keyword FROM keywords GROUP BY query`)
             activeKeys = activeKeys.map((v) => v.keyword)
 
+            let curDate = moment().format('YYYY-MM-DD HH:mm:ss');
+            let preDate = moment().add(-4, 'hours').format('YYYY-MM-DD HH:mm:ss');
+
+            console.log(``)
+
             let keywords = await sqlite.all(
-                `SELECT DISTINCT keyword, total_products, position, min(position) as min, max(position) as max, max(timestamp) FROM stats WHERE product in ('${products}') GROUP BY keyword ORDER BY timestamp DESC`
+                `SELECT DISTINCT
+                    keyword,
+                    total_products,
+                    position,
+                    min(position) AS min,
+                    max(position) AS max,
+                    max(timestamp)
+                FROM (SELECT * FROM stats WHERE product IN ('${products}') AND keyword IN ('${activeKeys.join('\',\'')}') AND timestamp BETWEEN "${preDate}" AND "${curDate}")
+                GROUP BY keyword
+                ORDER BY timestamp DESC;
+                `
             )
             keywords = keywords.map((v) => {
                 let isActive = (activeKeys.indexOf(v.keyword) > -1) ? true : false
@@ -56,26 +72,27 @@ wss.on('connection', async function(ws){
         }
         if(message.type == 'get.product.data') {
             let product = message.data.products[0]
-            let url = "https://wbx-content-v2.wbstatic.net/ru/" + product + ".json"
-            let response = await fetch(url)
-            let jsonData = await response.json()
-            ws.send(JSON.stringify({type: 'product.data', data: jsonData}))
+            let query = `SELECT * FROM product_stats WHERE product_id = ${product} ORDER BY timestamp DESC LIMIT 1`
+            let response = await sqlite.all(query)
+            ws.send(JSON.stringify({type: 'product.data', data: response}))
+
         }
         if(message.type == 'get.products') ws.send(JSON.stringify({type:'products', data:products}))
         if(message.type == 'get.stats') {
             let products = (message.data.products).join("','")
             let keywords = (message.data.keywords).join("','")
             let stats = await sqlite.all(
-                `select strftime('%m%d%H', timestamp), timestamp, position, keyword, product, total_products
+                `select strftime('%m%d%H%M', timestamp), timestamp, position, keyword, product, total_products
                 from stats
                 WHERE product in ('${products}') AND keyword in ('${keywords}')
-                group by strftime('%m%d%H', timestamp), keyword, product
-                ORDER by timestamp DESC`
+                group by strftime('%m%d%H%M', timestamp), keyword, product
+                ORDER by timestamp DESC
+                LIMIT 3000`
             )
 
             let diff = await sqlite.all(
                 `select * from product_stats WHERE product_id in ('${products}')
-                ORDER BY timestamp DESC`
+                ORDER BY timestamp ASC`
             )
 
             ws.send(JSON.stringify({type:'stats', data:stats, productDiff:diff}))

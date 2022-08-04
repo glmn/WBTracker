@@ -115,20 +115,19 @@ const app = new Vue({
             cubicInterpolationMode: 'monotone',
             backgroundColor: color,
             borderColor: '#28253b',
-            fill: false
+            fill: false,
+            datalabels: { display: false }
           })
           idx = datasets.length - 1
         }
         let date = new Date(stat.timestamp)
         date.setHours(date.getHours() + 3)
-        console.log(stat.timestamp, date.toLocaleString())
         datasets[idx].data.push({
           x: date,
           y: stat.position
         })
       }
       diff = diff.map((v) => {v.data = JSON.parse(v.data); return v})
-      console.log(recursiveDiff.getDiff(diff[0], diff[1], true))
 
       datasets.push({
         label: 'Изменения карточки',
@@ -141,19 +140,71 @@ const app = new Vue({
         pointStyle: 'rectRot',
         pointRadius: 8,
         pointBorderColor: '#000000',
-        fill: false
+        fill: false,
+        datalabels: { display: false }
       })
+
+      let blackPaths = ['timestamp', 'ao_id', 'stocks'];
 
       diff.forEach((product_stat, idx) => {
         if(idx == 0) return
+        let diffData = recursiveDiff.getDiff(diff[idx-1], diff[idx], true)
+        diffData = diffData.filter(el => !blackPaths.some(r => el.path.includes(r)))
+        if(!diffData.length) return
         let date = new Date(product_stat.timestamp)
         date.setHours(date.getHours() + 3)
         datasets[datasets.length-1].data.push({
           x: date,
           y: 1
         })
-        datasets[datasets.length-1].diffData.push(recursiveDiff.getDiff(diff[idx], diff[idx-1], true))
+        datasets[datasets.length-1].diffData.push(diffData)
       })
+
+      datasets.push({
+        label: 'Остатки',
+        data: [],
+        customData: [],
+        backgroundColor: '#830e59',
+        borderColor: '#830e59',
+        borderDash: [4,2],
+        yAxisID: 'yStocks',
+        datalabels: {
+          color: '#eeeeee',
+          backgroundColor: '#830e59',
+          borderRadius: 20,
+          borderWidth: 1,
+          padding: 5,
+          borderColor: '#000000',
+          display: true,
+          textAlign: 'center',
+          clamp: true,
+          clip: true,
+          font: {size: 10},
+          formatter: function(value, context) {
+            return value.y
+          }
+        }
+      })
+
+      diff.filter(el => typeof el.data.stocks == 'object').forEach((product_stat, idx) => {
+        let date = new Date(product_stat.timestamp)
+        let stocks = product_stat.data.stocks.map(v => v.qty)
+        console.log(stocks)
+        stocks = stocks.reduce((pre, cur) => {
+          console.log(idx, pre, cur)
+          return pre + cur
+        }, 0);
+        date.setHours(date.getHours() + 3)
+        datasets[datasets.length-1].data.push({
+          x: date,
+          y: stocks
+        })
+        datasets[datasets.length-1].customData.push({
+          ...product_stat.data.stocks
+        })
+      })
+
+      console.log(datasets[datasets.length-1])
 
       this.chart.data.datasets = datasets
       this.chart.update()
@@ -197,7 +248,7 @@ const app = new Vue({
           this.products = tmpProductsArr
           break;
         case 'product.data':
-          this.productData = data.data
+          this.productData = JSON.parse(data.data[0].data)
           let sku = this.productData.nm_id
           let skuArchive = parseInt(sku/10000)
           let photoUrl = `https://images.wbstatic.net/c246x328/new/${skuArchive}0000/${sku}-1.jpg`
@@ -205,6 +256,27 @@ const app = new Vue({
           break;
         case 'stats':
           this.updateChart(data.data, data.productDiff)
+          break;
+        case 'error':
+          if(data.data == 'keyword_duplicate'){
+            new Notify ({
+              status: 'error',
+              title: 'Ошибка',
+              text: 'Данное ключевое слово уже есть в базе',
+              effect: 'fade',
+              speed: 300,
+              customClass: '',
+              customIcon: '',
+              showIcon: false,
+              showCloseButton: false,
+              autoclose: true,
+              autotimeout: 3000,
+              gap: 44,
+              distance: 20,
+              type: 3,
+              position: 'right top'
+            })
+          }
           break;
       }
     };
@@ -260,7 +332,7 @@ const app = new Vue({
           let dataset = tooltip.dataPoints[i].dataset
           if('diffData' in dataset){
             let diffData = dataset.diffData[dataIndex]
-            let blackPaths = ['timestamp', 'ao_id']
+            let blackPaths = ['timestamp', 'ao_id', 'stocks']
             let whitePaths = ['description']
             diffData.forEach((diff,i) => {
               console.log(diff)
@@ -274,7 +346,6 @@ const app = new Vue({
                 let oldImage = (document.createElement('img'))
                 oldImage.setAttribute("src","data:image/png;base64," + diff.oldVal);
 
-                console.log(newImage)
                 td.appendChild(oldImage);
                 tr.appendChild(td);
                 td.appendChild(newImage);
@@ -283,7 +354,18 @@ const app = new Vue({
                 return;
               }
 
-              if(diff.op == 'add'){
+              if(diff.path[1] == 'stocks'){
+                const span = document.createElement('span');
+                span.classList.add('add-badge')
+                span.textContent = 'Остатки';
+                tr.appendChild(span);
+                td.innerHTML = diff.val;
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+              }
+
+              if(diff.op == 'add' && diff.val){
                 td.innerHTML = '<span class="add-badge">New</span>'
                 tr.appendChild(td);
                 td.innerHTML = diff.val;
@@ -358,10 +440,12 @@ const app = new Vue({
       pan: {
           enabled: true,
           modifierKey: "",
-          mode: "xy",
+          mode: "x",
+          overScaleMode: "x",
         },
       limits: {
-        y: {min:0, max:'original'},
+        y: {min:0},
+        yStocks: {min:0},
         x: {}
       },
       zoom: {
@@ -378,6 +462,7 @@ const app = new Vue({
     this.chart = new Chart('myChart', {
         type: 'line',
         data: {},
+        plugins: [ChartDataLabels],
         options: {
           interaction: {
             intersect: false,
@@ -386,6 +471,7 @@ const app = new Vue({
           maintainAspectRatio: false,
           responsive: true,
           plugins: {
+            ChartDataLabels,
             zoom: zoomOptions,
             legend: {
               display: false
@@ -394,7 +480,7 @@ const app = new Vue({
               enabled: false,
               position: 'nearest',
               external: externalTooltipHandler
-            }
+            },
           },
           scales: {
             x: {
@@ -418,7 +504,18 @@ const app = new Vue({
               beginAtZero: true,
               position: 'right',
               reverse: true,
-            }
+            },
+            yStocks: {
+              beginAtZero: true,
+              type: 'linear',
+              display: true,
+              position: 'left',
+
+              // grid line settings
+              grid: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+              },
+            },
           }
         }
     })

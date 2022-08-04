@@ -1,7 +1,7 @@
 {
   "name": "wbtracker",
   "type": "module",
-  "version": "0.0.4b",
+  "version": "0.0.5fix",
   "description": "Wildberries search positions tracker",
   "main": "index.js",
   "scripts": {
@@ -26,11 +26,15 @@
   "dependencies": {
     "aa-sqlite": "^1.0.29",
     "connect": "^3.7.0",
+    "https-proxy-agent": "^5.0.1",
     "loader-in-console": "^1.2.1",
     "log-beautify": "^1.2.0",
+    "moment": "^2.29.3",
     "node-fetch": "^3.2.3",
     "serve-static": "^1.15.0",
+    "socks-proxy-agent": "^7.0.0",
     "sqlite3": "^5.0.3",
+    "wb-keywords": "^1.0.0",
     "ws": "^8.5.0"
   }
 }
