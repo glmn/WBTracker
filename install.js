@@ -16,7 +16,8 @@ import sqlite from 'aa-sqlite'
     await sqlite.push(
         `CREATE TABLE keywords (
             keyword        STRING  UNIQUE,
-            total_products INT (5)
+            total_products INT (5),
+            query        STRING
         );`
     )
     console.log('Created table keywords')
