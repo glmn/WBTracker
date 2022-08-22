@@ -1,7 +1,7 @@
 {
   "name": "wbtracker",
   "type": "module",
-  "version": "0.0.5fix",
+  "version": "0.0.6",
   "description": "Wildberries search positions tracker",
   "main": "index.js",
   "scripts": {
