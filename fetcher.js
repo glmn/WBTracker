@@ -56,7 +56,7 @@ class WBProduct {
         }
 
         let queryParams = new URLSearchParams(params).toString()
-        let url = 'https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog?' + queryParams
+        let url = 'https://card.wb.ru/cards/detail?' + queryParams
         try {
             this.response = await fetch(url)
             this.data.stocks = (await this.response.json()).data.products[0].sizes[0].stocks
@@ -114,33 +114,26 @@ class WBSearch {
         this.positions = []
 
         this.params = {
+            'query': this.keyword.keyword,
             'page': 1,
-            'spp': 19,
             'regions': [69,64,86,83,4,38,30,33,70,22,31,66,68,82,48,1,40,80],
-            'stores': [117673,122258,122259,130744,117501,507,3158,124731,121709,120762,117986,159402,2737],
-            'pricemarginCoeff': 1.0,
-            'reg': 1,
             'appType': 1,
-            'offlineBonus': 0,
-            'onlineBonus': 0,
-            'emp': 0,
             'locale': 'ru',
-            'lang': 'ru',
-            'curr': 'rub',
-            'couponsGeo': [2,6,7,3,19,21,8],
             'dest': [-1059500,-108082,-269701,12358048],
             'sort': 'popular',
-            'limit': 300
+            'limit': 300,
+            'resultset': 'catalog',
         }
     }
 
     async fetchData(){
         let queryParams = new URLSearchParams(this.params).toString()
-        let url = 'https://wbxcatalog-ru.wildberries.ru/' + this.keyword.shardKey + '/catalog?' + queryParams + '&' + this.keyword.query
+        let url ='https://search.wb.ru/exactmatch/ru/female/v4/search?' + queryParams
         try {
             let response = await fetch(url)
             let jsonData = await response.json()
             this.positions.push(...jsonData.data.products)
+
 
             if(jsonData.data.products.length == 300){
                 this.params.page += 1
