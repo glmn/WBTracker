@@ -148,7 +148,7 @@ const app = new Vue({
 
       diff.forEach((product_stat, idx) => {
         if(idx == 0) return
-        let diffData = recursiveDiff.getDiff(diff[idx-1], diff[idx], true)
+        let diffData = recursiveDiff.getDiff(diff[idx], diff[idx-1], true)
         diffData = diffData.filter(el => !blackPaths.some(r => el.path.includes(r)))
         if(!diffData.length) return
         let date = new Date(product_stat.timestamp)
