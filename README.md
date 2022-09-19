@@ -26,7 +26,8 @@
 - [x] Implement Interactive mode
 - [x] Realtime Charts
 - [x] Implement <code>insert</code> of *keywords* and *products*
+- [x] SKU Preview - image, title, orders(?), count
 - [ ] Implement <code>Bulk insert</code> of *keywords* and *products*
 - [ ] Implement <code>remove</code> of *keywords* and *products*
-- [x] SKU Preview - image, title, orders(?), count
 - [ ] Switch to PostgreSQL
+- [ ] Implement <a href="https://github.com/glmn/wb-private-api">@glmn/wb-private-api</a> library 
