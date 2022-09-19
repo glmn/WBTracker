@@ -26,6 +26,7 @@
 - [x] Implement Interactive mode
 - [x] Realtime Charts
 - [x] Implement <code>insert</code> of *keywords* and *products*
+- [ ] Implement <code>Bulk insert</code> of *keywords* and *products*
 - [ ] Implement <code>remove</code> of *keywords* and *products*
 - [x] SKU Preview - image, title, orders(?), count
-- [ ] Switch to MongoDB (?) - road to new Analytics abilities
+- [ ] Switch to PostgreSQL

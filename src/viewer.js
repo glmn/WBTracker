@@ -1,6 +1,5 @@
-import {WebSocketServer} from 'ws'
+import { WebSocketServer } from 'ws'
 import sqlite from 'aa-sqlite';
-import fetch from 'node-fetch';
 import connect from 'connect'
 import serveStatic from 'serve-static'
 import moment from 'moment'
@@ -39,8 +38,6 @@ wss.on('connection', async function(ws){
 
             let curDate = moment().format('YYYY-MM-DD HH:mm:ss');
             let preDate = moment().add(-4, 'hours').format('YYYY-MM-DD HH:mm:ss');
-
-            console.log(``)
 
             let keywords = await sqlite.all(
                 `SELECT DISTINCT
