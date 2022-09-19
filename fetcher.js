@@ -132,10 +132,14 @@ class WBSearch {
         try {
             let response = await fetch(url)
             let jsonData = await response.json()
+
+            if (jsonData?.data?.products === undefined) {
+                return
+            }
+
             this.positions.push(...jsonData.data.products)
 
-
-            if(jsonData.data.products.length == 300){
+            if (jsonData.data.products.length === 300) {
                 this.params.page += 1
                 if(this.params.page <= 100){
                     await this.fetchData()
