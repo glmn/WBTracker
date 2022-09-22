@@ -116,10 +116,10 @@ class WBSearch {
         this.params = {
             'query': this.keyword.keyword,
             'page': 1,
-            'regions': [69,64,86,83,4,38,30,33,70,22,31,66,68,82,48,1,40,80],
+            'regions': [68, 64, 83, 4, 38, 80, 33, 70, 82, 86, 75, 30, 69, 22, 66, 31, 40, 1, 48, 71],
             'appType': 1,
             'locale': 'ru',
-            'dest': [-1059500,-108082,-269701,12358048],
+            'dest': [-1029256, -102269, -1278703, -1255563],
             'sort': 'popular',
             'limit': 300,
             'resultset': 'catalog',
