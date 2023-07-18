@@ -1,6 +1,12 @@
-<p align="center"><i>:baby_chick: Work In Progress <code>use it on your own risk</code></i></p>
-<p align="center"><b><a href="https://t.me/+gyce99iRxNwyOWQy">Группа в Telegram</a></b></p>
-<p align="center"><b><a href="https://telegra.ph/WBTracker--Analitika-poiskovyh-zaprosov-na-Wildberries-na-vashem-kompyutere-ili-na-VDS-absolyutno-besplatno-Instrukciya-po-Ustan-05-23">Инструкция по Установке на Русском</a></b></p>
+<p align="center">WBTracker более не разрабатывается, т.к. был пересоздан в виде SaaS решения<br/><br/>
+<img src="https://github.com/glmn/glmn/assets/1326151/549b8bed-60c3-4f6e-8f5a-8592c63467b6" height="35"></p>
+
+<img src="https://github.com/glmn/glmn/assets/1326151/5f38f86c-7014-4e73-8fa1-c6657a902826" height="11">
+<b>Нейромаркет</b> - Глубокий Анализ товаров на Wildberries.
+Выдача доступов к закрытому бета-тестированию -> <b><a href="https://t.me/+tN3mdbvUP1RkNDgy" target="_blank">Телеграм канал</a></b>
+
+<br/><br/>
+<p align="center"><b><a href="https://telegra.ph/WBTracker--Analitika-poiskovyh-zaprosov-na-Wildberries-na-vashem-kompyutere-ili-na-VDS-absolyutno-besplatno-Instrukciya-po-Ustan-05-23">Инструкция по Установке WBTracker на Русском</a></b></p>
 <p align="center"><img img src="https://user-images.githubusercontent.com/1326151/163515423-5dc79c03-aa3f-42a8-946b-6f53911c7b61.png"></p>
 <h4 align="center">Track and store your products search positions by keywords on Wildberries</h4>
 <h5 align="center">:trophy:<code>Must Have <s>Weapon</s> Tool for TOP-1 on Wildberries</code></h5>
