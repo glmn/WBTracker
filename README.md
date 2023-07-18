@@ -1,9 +1,9 @@
 <p align="center">WBTracker более не разрабатывается, т.к. был пересоздан в виде SaaS решения<br/><br/>
 <img src="https://github.com/glmn/glmn/assets/1326151/549b8bed-60c3-4f6e-8f5a-8592c63467b6" height="35"></p>
 
-<img src="https://github.com/glmn/glmn/assets/1326151/5f38f86c-7014-4e73-8fa1-c6657a902826" height="11">
-<b>Нейромаркет</b> - Глубокий Анализ товаров на Wildberries.
-Выдача доступов к закрытому бета-тестированию -> <b><a href="https://t.me/+tN3mdbvUP1RkNDgy" target="_blank">Телеграм канал</a></b>
+
+<p align="center"><img src="https://github.com/glmn/glmn/assets/1326151/5f38f86c-7014-4e73-8fa1-c6657a902826" height="11"> <b>Нейромаркет</b> - Глубокий Анализ товаров на Wildberries.<br/>
+Выдача доступов к закрытому бета-тестированию -> <b><a href="https://t.me/+tN3mdbvUP1RkNDgy" target="_blank">Телеграм канал</a></b></p>
 
 <br/><br/>
 <p align="center"><b><a href="https://telegra.ph/WBTracker--Analitika-poiskovyh-zaprosov-na-Wildberries-na-vashem-kompyutere-ili-na-VDS-absolyutno-besplatno-Instrukciya-po-Ustan-05-23">Инструкция по Установке WBTracker на Русском</a></b></p>
